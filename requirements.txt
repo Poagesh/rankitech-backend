@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+pydantic
+celery
+redis
+sentence-transformers
+python-dotenv
+fastapi-users
+fastapi-users-db-sqlalchemy
