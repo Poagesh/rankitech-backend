@@ -19,10 +19,14 @@ services:
       - "6379:6379"
 
   db:
-    image: postgres
+    image: postgres:16
+    container_name: rankitech_postgres_db
+    restart: always
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: rankitech@postgres
       POSTGRES_DB: rankitech
     ports:
-      - "5432:5432"
+      - "5432:5432" 
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
