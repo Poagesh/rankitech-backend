@@ -2,6 +2,8 @@ from celery import Celery
 from app.config import settings
 from app.database import SessionLocal
 from app import models, nlp_utils, email_utils
+from .email_utils import send_email_async
+import asyncio
 
 celery = Celery("tasks", broker=settings.REDIS_BROKER_URL)
 
@@ -23,3 +25,7 @@ def process_matching(jd_id, email):
         email_utils.send_email(email, "Top Matches for JD", body)
     else:
         email_utils.send_email(email, "No Matches Found", "We couldn't find a suitable profile.")
+
+@celery.task
+def send_email_task(to_email: str, subject: str, message: str):
+    asyncio.run(send_email_async(to_email, subject, message))
