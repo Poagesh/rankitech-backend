@@ -5,12 +5,42 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
+
+# ---------- Admin Table ----------
+class admin(Base):
+    __tablename__ = "admins"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False)
+    email = Column(String, unique=True, nullable=False)
+    password = Column(String, nullable=False)  # In production, hash the password
+
+
+#-- Recruiter Table ----------
+class recruiter(Base):
+    __tablename__ = "recruiters"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String, nullable=False)
+    email = Column(String, unique=True, nullable=False)
+    password = Column(String, nullable=False)  # In production, hash the password
+    phone_number = Column(String, nullable=False)
+    company_name = Column(String, nullable=False)
+    designation = Column(String, nullable=False)
+    company_website = Column(String, nullable=True)
+    industry = Column(String, nullable=False)
+    company_type = Column(String, nullable=False)    
+
+# ---------- Job Description Table ----------
 class JobDescription(Base):
     __tablename__ = "job_descriptions"
     id = Column(Integer, primary_key=True)
     title = Column(String)
     content = Column(Text)
+    skills_required = Column(String)
+    start_date = Column(String)
+    end_date = Column(String)
 
+
+# ---------- Match Result Table ----------
 class MatchResult(Base):
     __tablename__ = "match_results"
     id = Column(Integer, primary_key=True)

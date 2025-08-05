@@ -3,6 +3,22 @@ from pydantic import BaseModel, EmailStr
 from typing import List, Optional
 from datetime import date
 
+class RegisterInput(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
+    role: str
+
+class RecruiterCreate(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
+    phone_number: str
+    company_name: str
+    designation: str
+    company_website: Optional[str]
+    industry: str
+    company_type: str
 
 class JDInput(BaseModel):
     title: str

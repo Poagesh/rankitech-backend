@@ -1,5 +1,6 @@
 # app/api/routes.py
-from fastapi import APIRouter, Depends, HTTPException
+import random
+from fastapi import APIRouter, Depends, HTTPException, status
 from typing import List
 from sqlalchemy.orm import Session
 from app.database import SessionLocal
@@ -8,10 +9,14 @@ from app.models import ConsultantProfile, EducationDetail, Project, TechnicalSki
 from app.schemas import ProfileInput, ProfileResponse, EmailRequest, OTPVerifyRequest
 from app.tasks import send_email_task
 from app.redis_manager import get_redis
-import random
 from app.config import settings
+from app.crud import create_recruiter
+from passlib.context import CryptContext
 
 router = APIRouter()
+
+# Password hashing context
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def get_db():
     db = SessionLocal()
@@ -29,15 +34,35 @@ def add_jd(jd: schemas.JDInput, email: str, db: Session = Depends(get_db)):
     tasks.process_matching.delay(new_jd.id, email)
     return {"msg": "JD added and processing started"}
 
+@router.post("/register-recruiter", response_model=schemas.RecruiterCreate)
+def register_recruiter(recruiter: schemas.RecruiterCreate, db: Session = Depends(get_db)):
+    return create_recruiter(db, recruiter)
+
+# @router.post("/ar/register", response_model=ProfileResponse)
+# def register_consultant_profile(profile_in: ProfileInput, db: Session = Depends(get_db)):
+#     # Check if primary_email already exists
+#     existing_profile = db.query(ConsultantProfile).filter(ConsultantProfile.primary_email == profile_in.primary_email).first()
+#     if existing_profile:
+#         raise HTTPException(
+#             status_code=status.HTTP_400_BAD_REQUEST,
+#             detail="A profile with this primary email already exists."
+#         )
+
+#     profile = create_consultant_profile(db, profile_in)
+#     return profile
+
 # ---------- Create Profile ----------
-@router.post("/profiles/", response_model=ProfileResponse)
+
+@router.post("/ar-register", response_model=ProfileResponse)
 def create_profile(profile_data: ProfileInput, db: Session = Depends(get_db)):
     # Check if email already exists
     existing = db.query(ConsultantProfile).filter(ConsultantProfile.primary_email == profile_data.primary_email).first()
     if existing:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
 
-    # Create main profile
+    hashed_password = pwd_context.hash(profile_data.password)
+
+
     profile = ConsultantProfile(
         name=profile_data.name,
         dob=profile_data.dob,
@@ -47,7 +72,7 @@ def create_profile(profile_data: ProfileInput, db: Session = Depends(get_db)):
         primary_email=profile_data.primary_email,
         personal_email=profile_data.personal_email,
         mobile_no=profile_data.mobile_no,
-        password=profile_data.password,  # In production, hash the password
+        password=hashed_password,
         country=profile_data.country,
         pincode=profile_data.pincode,
         state=profile_data.state,
