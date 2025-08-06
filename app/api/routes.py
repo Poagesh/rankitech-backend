@@ -14,6 +14,9 @@ from app.config import settings
 from app.crud import create_recruiter
 from passlib.context import CryptContext
 from datetime import datetime
+from app import auth
+from passlib.hash import bcrypt
+
 
 
 
@@ -192,3 +195,44 @@ async def verify_otp(data: OTPVerifyRequest):
     # OTP is valid -> delete it from Redis
     await redis.delete(f"otp:{data.email}")
     return {"message": "Email verified successfully"}
+
+#-------------Login Endpoint-------------
+# Utility to check email across all tables
+def get_user_and_role_by_email(email: str, db: Session):
+    # Admins
+    user = db.query(models.admin).filter(models.admin.email == email).first()
+    if user:
+        return user, "admin"
+
+    # Recruiters
+    user = db.query(models.recruiter).filter(models.recruiter.email == email).first()
+    if user:
+        return user, "recruiter"
+
+    # Consultant Profiles
+    user = db.query(models.ConsultantProfile).filter(models.ConsultantProfile.primary_email == email).first()
+    if user:
+        return user, "user"
+
+    return None, None
+
+
+@router.post("/login", response_model=schemas.LoginResponse)
+def login(data: schemas.LoginRequest, db: Session = Depends(get_db)):
+    user, role = get_user_and_role_by_email(data.email, db)
+
+    if not user or not bcrypt.verify(data.password, user.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password"
+        )
+
+    token_data = {"sub": data.email, "role": role}
+    access_token = auth.create_access_token(token_data)
+
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "role": role,
+        "user_id": user.id 
+    }
