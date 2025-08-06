@@ -2,6 +2,7 @@
 from pydantic import BaseModel, EmailStr
 from typing import List, Optional
 from datetime import date
+from fastapi import UploadFile, File
 
 class RegisterInput(BaseModel):
     name: str
@@ -99,7 +100,7 @@ class ProfileInput(BaseModel):
     extra_curricular_activities: List[ExtraCurricularInput]
 
     # Resume file path or URL
-    resume: Optional[str] = None
+    # resume:  UploadFile = File(...)
 
 
 
@@ -108,42 +109,42 @@ class ProfileInput(BaseModel):
 class EducationDetailResponse(EducationDetailInput):
     id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ProjectResponse(ProjectInput):
     id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class TechnicalSkillResponse(TechnicalSkillInput):
     id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class LanguageResponse(LanguageInput):
     id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class SubjectResponse(SubjectInput):
     id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ExperienceResponse(ExperienceInput):
     id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class AchievementResponse(AchievementInput):
     id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ExtraCurricularResponse(ExtraCurricularInput):
     id: int
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ProfileResponse(BaseModel):
     id: int
@@ -161,7 +162,7 @@ class ProfileResponse(BaseModel):
     district: Optional[str]
     city: Optional[str]
     address_line: Optional[str]
-    resume: Optional[str]
+    # resume: Optional[str]
 
     education_details: List[EducationDetailResponse]
     projects: List[ProjectResponse]
@@ -173,7 +174,7 @@ class ProfileResponse(BaseModel):
     extra_curricular_activities: List[ExtraCurricularResponse]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 #--------------OTP Verification Schemas-------------

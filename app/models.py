@@ -1,5 +1,5 @@
 # app/models.py
-from sqlalchemy import Column, Integer, String, Text, Float, Date, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, Float, Date, ForeignKey, LargeBinary
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -72,8 +72,8 @@ class ConsultantProfile(Base):
     city = Column(String)
     address_line = Column(Text)
 
-    # Resume (file path or URL)
-    resume = Column(String)
+    # Resume (binary data)
+    # resume = Column(LargeBinary)
 
     # Relationships
     education_details = relationship("EducationDetail", back_populates="profile", cascade="all, delete-orphan")

@@ -1,7 +1,8 @@
 # app/api/routes.py
 import random
-from fastapi import APIRouter, Depends, HTTPException, status
-from typing import List
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
+import json
+from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.database import SessionLocal
 from app import models, schemas, tasks
@@ -12,6 +13,9 @@ from app.redis_manager import get_redis
 from app.config import settings
 from app.crud import create_recruiter
 from passlib.context import CryptContext
+from datetime import datetime
+
+
 
 router = APIRouter()
 
@@ -53,45 +57,93 @@ def register_recruiter(recruiter: schemas.RecruiterCreate, db: Session = Depends
 
 # ---------- Create Profile ----------
 
+
 @router.post("/ar-register", response_model=ProfileResponse)
-def create_profile(profile_data: ProfileInput, db: Session = Depends(get_db)):
-    # Check if email already exists
-    existing = db.query(ConsultantProfile).filter(ConsultantProfile.primary_email == profile_data.primary_email).first()
+async def create_profile(
+    name: str = Form(...),
+    dob: str = Form(...),
+    gender: str = Form(...),
+    college: str = Form(...),
+    institution_roll_no: str = Form(...),
+    primary_email: str = Form(...),
+    personal_email: Optional[str] = Form(None),
+    mobile_no: str = Form(...),
+    password: str = Form(...),
+    country: str = Form(...),
+    pincode: str = Form(...),
+    state: str = Form(...),
+    district: str = Form(...),
+    city: str = Form(...),
+    address_line: str = Form(...),
+    # resume: UploadFile = File(...),
+    education_details: str = Form("[]"),
+    projects: str = Form("[]"),
+    technical_skills: str = Form("[]"),
+    languages: str = Form("[]"),
+    subjects: str = Form("[]"),
+    experiences: str = Form("[]"),
+    achievements: str = Form("[]"),
+    extra_curricular_activities: str = Form("[]"),
+    db: Session = Depends(get_db)
+):
+    # Convert DOB string to date object
+    try:
+        dob_date = datetime.strptime(dob, "%Y-%m-%d").date()
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD.")
+
+    # Parse JSON strings
+    education_details_list = json.loads(education_details)
+    projects_list = json.loads(projects)
+    technical_skills_list = json.loads(technical_skills)
+    languages_list = json.loads(languages)
+    subjects_list = json.loads(subjects)
+    experiences_list = json.loads(experiences)
+    achievements_list = json.loads(achievements)
+    extra_curricular_activities_list = json.loads(extra_curricular_activities)
+
+    # Check if email exists
+    existing = db.query(ConsultantProfile).filter(ConsultantProfile.primary_email == primary_email).first()
     if existing:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
+        raise HTTPException(status_code=400, detail="Email already registered")
 
-    hashed_password = pwd_context.hash(profile_data.password)
+    # Hash password
+    hashed_password = pwd_context.hash(password)
 
+    # Read resume bytes
+    # resume_bytes = await resume.read()
 
+    # Create main profile
     profile = ConsultantProfile(
-        name=profile_data.name,
-        dob=profile_data.dob,
-        gender=profile_data.gender,
-        college=profile_data.college,
-        institution_roll_no=profile_data.institution_roll_no,
-        primary_email=profile_data.primary_email,
-        personal_email=profile_data.personal_email,
-        mobile_no=profile_data.mobile_no,
+        name=name,
+        dob=dob_date,
+        gender=gender,
+        college=college,
+        institution_roll_no=institution_roll_no,
+        primary_email=primary_email,
+        personal_email=personal_email,
+        mobile_no=mobile_no,
         password=hashed_password,
-        country=profile_data.country,
-        pincode=profile_data.pincode,
-        state=profile_data.state,
-        district=profile_data.district,
-        city=profile_data.city,
-        address_line=profile_data.address_line,
-        resume=profile_data.resume
+        country=country,
+        pincode=pincode,
+        state=state,
+        district=district,
+        city=city,
+        address_line=address_line,
+        # resume=resume_bytes
     )
 
-    # Add related records
-    profile.education_details = [EducationDetail(**ed.dict()) for ed in profile_data.education_details]
-    profile.projects = [Project(**p.dict()) for p in profile_data.projects]
-    profile.technical_skills = [TechnicalSkill(**s.dict()) for s in profile_data.technical_skills]
-    profile.languages = [Language(**l.dict()) for l in profile_data.languages]
-    profile.subjects = [Subject(**sub.dict()) for sub in profile_data.subjects]
-    profile.experiences = [Experience(**e.dict()) for e in profile_data.experiences]
-    profile.achievements = [Achievement(**a.dict()) for a in profile_data.achievements]
-    profile.extra_curricular_activities = [ExtraCurricular(**ec.dict()) for ec in profile_data.extra_curricular_activities]
+    # Create nested relationships
+    profile.education_details = [EducationDetail(**ed) for ed in education_details_list]
+    profile.projects = [Project(**p) for p in projects_list]
+    profile.technical_skills = [TechnicalSkill(**s) for s in technical_skills_list]
+    profile.languages = [Language(**l) for l in languages_list]
+    profile.subjects = [Subject(**sub) for sub in subjects_list]
+    profile.experiences = [Experience(**e) for e in experiences_list]
+    profile.achievements = [Achievement(**a) for a in achievements_list]
+    profile.extra_curricular_activities = [ExtraCurricular(**ec) for ec in extra_curricular_activities_list]
 
+    # Save to DB
     db.add(profile)
     db.commit()
     db.refresh(profile)
