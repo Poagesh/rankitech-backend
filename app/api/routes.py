@@ -1,12 +1,14 @@
 # app/api/routes.py
 import random
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
+from starlette.responses import StreamingResponse
+from io import BytesIO
 import json
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from app.database import SessionLocal
 from app import models, schemas, tasks
-from app.models import ConsultantProfile, EducationDetail, Project, TechnicalSkill, Language, Subject, Experience, Achievement, ExtraCurricular
+from app.models import ConsultantProfile, EducationDetail, Project, TechnicalSkill, Language, Subject, Experience, Achievement, ExtraCurricular, Resume
 from app.schemas import ProfileInput, ProfileResponse, EmailRequest, OTPVerifyRequest
 from app.tasks import send_email_task
 from app.redis_manager import get_redis
@@ -236,3 +238,38 @@ def login(data: schemas.LoginRequest, db: Session = Depends(get_db)):
         "role": role,
         "user_id": user.id 
     }
+
+
+# ---------- Resume  ----------
+@router.post("/upload-resume")
+async def upload_resume(
+    consultant_id: int = Form(...),
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db)
+):
+    if file.content_type not in ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]:
+        raise HTTPException(status_code=400, detail="Only PDF or DOCX files are allowed.")
+
+    file_data = await file.read()
+
+    resume = Resume(
+        consultant_id=consultant_id,
+        file_name=file.filename,
+        file_type=file.content_type,
+        file_data=file_data
+    )
+    db.add(resume)
+    db.commit()
+    db.refresh(resume)
+
+    return {"message": "Resume uploaded successfully", "resume_id": resume.id}
+
+@router.get("/get-resume/{consultant_id}")
+def get_resume(consultant_id: int, db: Session = Depends(get_db)):
+    resume = db.query(Resume).filter(Resume.consultant_id == consultant_id).order_by(Resume.uploaded_at.desc()).first()
+    if not resume:
+        raise HTTPException(status_code=404, detail="Resume not found.")
+
+    return StreamingResponse(BytesIO(resume.file_data), media_type=resume.file_type, headers={
+        "Content-Disposition": f"attachment; filename={resume.file_name}"
+    })
