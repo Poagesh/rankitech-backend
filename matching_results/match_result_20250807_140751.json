@@ -1,0 +1,109 @@
+{
+  "resume": {
+    "name": "Poagesh N",
+    "email": "poageshn@gmail.com",
+    "phone": "+91 74185 71617",
+    "skills": [
+      "HTML",
+      "CSS",
+      "Docker",
+      "AI",
+      "API",
+      "Django",
+      "MySQL",
+      "Java",
+      "SQL",
+      "Flask",
+      "Python",
+      "Linux",
+      "CI/CD",
+      "GO",
+      "machine learning",
+      "deep learning",
+      "Node.js",
+      "Agile",
+      "PostgreSQL",
+      "Jenkins",
+      "Vue",
+      "Git",
+      "JavaScript"
+    ],
+    "experience": [
+      "National Informatics Centre | Software Development Intern",
+      "December 2024 \u2013 March 2025",
+      "* Developed an Alert System for the Government eProcurement project, improving data accessibility and reducing manual tracking efforts by 70%.",
+      "* Integrated AI/ML models to automate threshold detection, increasing alert accuracy by 85% and reducing false positives.",
+      "* Built and deployed 10+ scalable modules using Vue.js, Flask, Node.js, and PostgreSQL, enhancing system performance by 40%.",
+      "* Collaborated in an Agile team of 8, using GitLab CI/CD pipelines and delivering features with 100% sprint completion.",
+      "PROJECTS:",
+      "BOOMICARE | Flutter, Flask, Node.js, Firebase",
+      "* Developed a cross-platform app with Flutter, increasing user retention by 25%.",
+      "* Integrated real-time weather data via Open Meteo API, enhancing prediction accuracy by 35%.",
+      "* Built a machine learning model for crop prediction with Flask, improving accuracy by 40%.",
+      "* Deployed backend using Node.js and Firebase, ensuring 99.9% uptime.",
+      "MINETRACK | Flutter, Django, PostgreSQL, ERP Integration",
+      "* Developed a shift handover log system, cutting processing time by 50% and improving safety compliance by 40%.",
+      "* Implemented secure data storage and automated PDF reporting, reducing report generation time by 30%.",
+      "* Integrated with ERP software, enhancing operational efficiency by 20%.",
+      "AIML PROJECTS | Various Technologies",
+      "* Developed a C...",
+      "```"
+    ],
+    "education": [],
+    "certifications": [],
+    "projects": [
+      "BOOMICARE | Flutter, Flask, Node.js, Firebase",
+      "* Developed a cross-platform app with Flutter, increasing user retention by 25%.",
+      "* Integrated real-time weather data via Open Meteo API, enhancing prediction accuracy by 35%.",
+      "* Built a machine learning model for crop prediction with Flask, improving accuracy by 40%.",
+      "* Deployed backend using Node.js and Firebase, ensuring 99.9% uptime.",
+      "MINETRACK | Flutter, Django, PostgreSQL, ERP Integration",
+      "* Developed a shift handover log system, cutting processing time by 50% and improving safety compliance by 40%.",
+      "* Implemented secure data storage and automated PDF reporting, reducing report generation time by 30%.",
+      "* Integrated with ERP software, enhancing operational efficiency by 20%.",
+      "AIML PROJECTS | Various Technologies",
+      "* Developed a C...",
+      "```"
+    ],
+    "summary": "Highly motivated software engineer with a strong foundation in system design and AI integration. Proven ability to build high-performance, maintainable software and leverage technologies like Arch, Vue.js, and PostgreSQL. Passionate about clean architecture, developer tooling, and continuous learning.",
+    "total_experience_years": 0.0
+  },
+  "job_description": {
+    "title": "Backend Engineer",
+    "company": "Hexaware Technologies",
+    "description": "Experience in Python and FastAPI required.",
+    "required_skills": [
+      "Python",
+      "FastAPI",
+      "PostgreSQL"
+    ],
+    "preferred_skills": [],
+    "experience_level": null,
+    "location": "Chennai",
+    "salary_range": null
+  },
+  "match_result": {
+    "overall_score": 49.23,
+    "skills_match": 66.67,
+    "experience_match": 100.0,
+    "education_match": 75.0,
+    "detailed_analysis": {
+      "skills_match": 0,
+      "experience_match": 0,
+      "education_match": 0,
+      "overall_fit": 0,
+      "strengths": [],
+      "gaps": [],
+      "recommendations": []
+    },
+    "recommendations": [],
+    "missing_skills": [
+      "fastapi"
+    ],
+    "matching_skills": [
+      "python",
+      "postgresql"
+    ],
+    "timestamp": "2025-08-07T14:07:51.474767"
+  }
+}

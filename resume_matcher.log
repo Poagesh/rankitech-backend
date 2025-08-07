@@ -1,1 +1,83 @@
 2025-08-07 05:28:42,489 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-07 05:37:29,560 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-07 05:37:29,576 - app.resume_matcher - INFO - Processing resume: /tmp/tmpggn_dt0b.pdf
+2025-08-07 05:37:29,637 - app.resume_matcher - ERROR - Ollama generation error: Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download
+2025-08-07 05:37:29,641 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-07 07:04:17,612 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-07 07:04:17,616 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-07 07:04:17,643 - app.resume_matcher - INFO - Processing resume: /tmp/tmprh77oeb5.pdf
+2025-08-07 07:04:17,700 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 404 Not Found"
+2025-08-07 07:04:17,704 - app.resume_matcher - ERROR - Ollama generation error: model 'gemma2:1b' not found (status code: 404)
+2025-08-07 07:04:17,706 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-07 08:25:48,952 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-07 08:25:48,957 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-07 08:25:49,018 - app.resume_matcher - INFO - Processing resume: /tmp/tmpei7vs8aq.pdf
+2025-08-07 08:25:49,112 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 404 Not Found"
+2025-08-07 08:25:49,112 - app.resume_matcher - ERROR - Ollama generation error: model 'gemma2:1b' not found (status code: 404)
+2025-08-07 08:25:49,114 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-07 08:33:00,949 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-07 08:33:00,956 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-07 08:33:00,970 - app.resume_matcher - INFO - Processing resume: /tmp/tmpjua1i77y.pdf
+2025-08-07 08:33:01,021 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 404 Not Found"
+2025-08-07 08:33:01,033 - app.resume_matcher - ERROR - Ollama generation error: model 'gemma2:1b' not found (status code: 404)
+2025-08-07 08:33:01,035 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-07 09:23:49,667 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-07 09:23:49,684 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-07 09:23:49,710 - app.resume_matcher - INFO - Processing resume: /tmp/tmp1z7vnsrx.pdf
+2025-08-07 09:23:49,779 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 404 Not Found"
+2025-08-07 09:23:49,780 - app.resume_matcher - ERROR - Ollama generation error: model 'gemma2:1b' not found (status code: 404)
+2025-08-07 09:23:49,783 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-07 13:32:42,311 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-07 13:32:42,317 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-07 13:32:42,337 - app.resume_matcher - INFO - Processing resume: /tmp/tmprprmqvqq.pdf
+2025-08-07 13:32:42,426 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 404 Not Found"
+2025-08-07 13:32:42,428 - app.resume_matcher - ERROR - Ollama generation error: model 'gemma2:1b' not found (status code: 404)
+2025-08-07 13:32:42,430 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-07 13:36:33,326 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-07 13:36:33,330 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-07 13:36:33,367 - app.resume_matcher - INFO - Processing resume: /tmp/tmpsw265cyc.pdf
+2025-08-07 13:36:47,386 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-07 13:36:47,390 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-07 13:48:03,716 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-07 13:48:03,726 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-07 13:48:03,756 - app.resume_matcher - INFO - Processing resume: /tmp/tmps9ppdu8m.pdf
+2025-08-07 13:48:17,912 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-07 13:48:17,915 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-07 14:01:24,010 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-07 14:01:24,015 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-07 14:01:24,036 - app.resume_matcher - INFO - Processing resume: /tmp/tmpd7bzcih5.pdf
+2025-08-07 14:01:36,039 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-07 14:01:36,044 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-07 14:07:26,265 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-07 14:07:26,269 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-07 14:07:26,285 - app.resume_matcher - INFO - Processing resume: /tmp/tmposy2skip.pdf
+2025-08-07 14:07:39,366 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-07 14:07:39,372 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-07 14:07:51,469 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-07 14:07:51,496 - app.resume_matcher - INFO - Results saved: match_result_20250807_140751.json
+2025-08-07 14:07:51,497 - app.resume_matcher - INFO - Processing resume: /tmp/tmposy2skip.pdf
+2025-08-07 14:07:59,837 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-07 14:07:59,843 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-07 14:07:59,845 - app.resume_matcher - INFO - Generated report for: Poagesh N
+2025-08-07 14:31:29,912 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-07 14:31:29,920 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-07 14:31:29,940 - app.resume_matcher - INFO - Processing resume: /tmp/tmp66k6fefu.pdf
+2025-08-07 14:31:45,359 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-07 14:31:45,363 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-07 14:31:57,107 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-07 14:31:57,114 - app.resume_matcher - INFO - Results saved: match_result_20250807_143157.json
+2025-08-07 14:31:57,114 - app.resume_matcher - INFO - Processing resume: /tmp/tmp66k6fefu.pdf
+2025-08-07 14:32:04,742 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-07 14:32:04,744 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-07 14:32:04,745 - app.resume_matcher - INFO - Generated report for: Poagesh N
+2025-08-07 14:36:13,719 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-07 14:36:13,730 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-07 14:36:13,751 - app.resume_matcher - INFO - Processing resume: /tmp/tmp34v5r1bk.pdf
+2025-08-07 14:36:28,231 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-07 14:36:28,234 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-07 14:36:39,995 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-07 14:36:40,002 - app.resume_matcher - INFO - Results saved: match_result_20250807_143639.json
+2025-08-07 14:36:40,002 - app.resume_matcher - INFO - Processing resume: /tmp/tmp34v5r1bk.pdf
+2025-08-07 14:36:47,961 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-07 14:36:47,963 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-07 14:36:47,964 - app.resume_matcher - INFO - Generated report for: Poagesh N

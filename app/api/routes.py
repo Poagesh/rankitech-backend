@@ -333,30 +333,35 @@ def apply_to_job(application: JobApplicationCreate, db: Session = Depends(get_db
 #---------- Rank job applications ----------
 @router.post("/rank-job-applicants", response_model=List[ApplicantRankedMatch])
 def rank_job_applicants(request: RankApplicantsRequest, db: Session = Depends(get_db)):
+    # Fetch the job
     job = db.query(Job).filter(Job.id == request.job_id).first()
     if not job:
         raise HTTPException(status_code=404, detail="Job not found.")
 
+    # Fetch all applicants for this job
     applications = db.query(JobApplication).filter(JobApplication.job_id == job.id).all()
     if not applications:
         raise HTTPException(status_code=404, detail="No applicants found for this job.")
 
+    # Fetch recruiter
     recruiter_obj = db.query(recruiter).filter(recruiter.id == job.recruiter_id).first() if job.recruiter_id else None
 
+    # Prepare job description
     job_input = JobDescription(
         title=job.job_title,
         company=recruiter_obj.company_name if recruiter_obj else "YourCompany",
         description=job.job_description or "",
-        required_skills=job.required_skills or [],
-        preferred_skills=job.preferred_skills or [],
+        required_skills=job.required_skills if isinstance(job.required_skills, list) else [],
+        preferred_skills=job.preferred_skills if isinstance(job.preferred_skills, list) else [],
         experience_level=getattr(job, "experience_level", "Any"),
         location=job.location or "Remote"
     )
 
-    matcher = ResumeJDMatcher(model="gemma2:1b")
+
+    matcher = ResumeJDMatcher(model="gemma3:1b")
     results = []
 
-    # Optional: Clear previous matches for this job
+    # Clear previous matches
     db.query(RankedApplicantMatch).filter(RankedApplicantMatch.job_id == job.id).delete()
 
     for application in applications:
@@ -371,45 +376,46 @@ def rank_job_applicants(request: RankApplicantsRequest, db: Session = Depends(ge
         if not resume or not resume.file_data:
             continue
 
-        # Save binary data to a temporary file
+        # Save binary data to temporary file
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
             tmp_file.write(resume.file_data)
             tmp_file_path = tmp_file.name
 
         try:
+            # Process resume and match
             result = matcher.match_resume_to_job(tmp_file_path, job_input)
-            report = matcher.generate_report(result, matcher.process_resume(tmp_file_path), job_input)
+            resume_data = matcher.process_resume(tmp_file_path)
+            report = matcher.generate_report(result, resume_data, job_input)
 
+            # Save to database
             db_match = RankedApplicantMatch(
                 job_id=job.id,
                 consultant_id=consultant.id,
-                match_score=result["score"],
-                top_skills_matched=result["skills_matched"],
-                missing_skills=result["skills_missing"],
+                match_score=float(result.overall_score),
+                top_skills_matched=",".join(result.matching_skills),  # Convert list to comma-separated string
+                missing_skills=",".join(result.missing_skills),
                 report=report,
                 created_at=datetime.utcnow()
             )
             db.add(db_match)
 
+            # Append to results
             results.append(ApplicantRankedMatch(
                 consultant_id=consultant.id,
                 consultant_name=consultant.name,
-                match_score=result["score"],
-                top_skills_matched=result["skills_matched"],
-                missing_skills=result["skills_missing"],
+                match_score=result.overall_score,
+                top_skills_matched=result.matching_skills,
+                missing_skills=result.missing_skills,
                 report=report
             ))
 
         except Exception as e:
             print(f"Error processing consultant {consultant.id}: {e}")
             continue
-
         finally:
-            # Clean up the temporary file
             if os.path.exists(tmp_file_path):
                 os.remove(tmp_file_path)
 
     db.commit()
-
     results.sort(key=lambda x: x.match_score, reverse=True)
     return results

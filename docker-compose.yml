@@ -11,6 +11,7 @@ services:
     depends_on:
       - redis
       - db
+      - ollama
 
   redis:
     image: redis:alpine
@@ -26,9 +27,27 @@ services:
       POSTGRES_PASSWORD: rankitech@postgres
       POSTGRES_DB: rankitech
     ports:
-      - "5432:5432" 
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  ollama:
+    image: ollama/ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+
 volumes:
   postgres_data:
+  ollama-data:

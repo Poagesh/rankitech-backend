@@ -1,5 +1,5 @@
 # app/models.py
-from sqlalchemy import Column, Integer, String, Text, Float, Date, ForeignKey, LargeBinary, TIMESTAMP, func, ARRAY, DateTime, JSON
+from sqlalchemy import Column, Integer, String, Text, Float, Date, ForeignKey, LargeBinary, TIMESTAMP, func, ARRAY, DateTime, JSON, Boolean
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
@@ -212,6 +212,7 @@ class Job(Base):
     salary_range = Column(String)
     deadline_to_apply = Column(DateTime, nullable=True)  
     created_at = Column(TIMESTAMP, server_default=func.now())
+    email_sent = Column(Boolean, default=False)
 
     applications = relationship("JobApplication", back_populates="job", cascade="all, delete-orphan")
 

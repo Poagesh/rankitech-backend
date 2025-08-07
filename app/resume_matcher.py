@@ -1,7 +1,7 @@
 #app/resume_matcher.py
 """
 Resume-JD Matching System with Ollama Integration
-Description: Advanced resume analysis and job matching system using Ollama with Gemma2:1b
+Description: Advanced resume analysis and job matching system using Ollama with Gemma3:1b
 """
 
 import os
@@ -226,17 +226,17 @@ class TextProcessor:
 
 class OllamaClient:
     """Enhanced Ollama client with error handling and optimization"""
-    
+
     def __init__(self, model: str = "gemma3:1b"):
         self.model = model
         ollama_host = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+        # Create Ollama client with custom host
         self.client = ollama
         self.verify_model()
-    
-    def verify_model(self):
 
+    def verify_model(self):
         try:
-            model_list = ollama.list()
+            model_list = self.client.list()
 
             # Handle response from new Ollama Python client
             if hasattr(model_list, "models"):
@@ -255,7 +255,6 @@ class OllamaClient:
             print(f"Error verifying model: {e}")
             return False
 
-    
     def generate_analysis(self, prompt: str, max_tokens: int = 500) -> str:
         """Generate analysis using Ollama"""
         try:
@@ -273,8 +272,8 @@ class OllamaClient:
         except Exception as e:
             logger.error(f"Ollama generation error: {e}")
             return f"Analysis unavailable: {str(e)}"
-    
-    def analyze_resume_match(self, resume_text: str, jd_text: str) -> Dict:
+
+    def analyze_resume_match(self, resume_text: str, jd_text: str) -> dict:
         """Comprehensive resume-JD analysis"""
         prompt = f"""
         Analyze the following resume against the job description and provide a detailed assessment:
@@ -290,23 +289,23 @@ class OllamaClient:
         EXPERIENCE_MATCH: [0-100 score]
         EDUCATION_MATCH: [0-100 score]
         OVERALL_FIT: [0-100 score]
-        
+
         STRENGTHS:
         - [List key strengths]
-        
+
         GAPS:
         - [List skill/experience gaps]
-        
+
         RECOMMENDATIONS:
         - [Specific recommendations for improvement]
-        
+
         Keep the analysis concise but comprehensive.
         """
-        
+
         analysis = self.generate_analysis(prompt, max_tokens=600)
         return self._parse_analysis(analysis)
-    
-    def _parse_analysis(self, analysis: str) -> Dict:
+
+    def _parse_analysis(self, analysis: str) -> dict:
         """Parse Ollama analysis response"""
         result = {
             'skills_match': 0,
@@ -317,7 +316,7 @@ class OllamaClient:
             'gaps': [],
             'recommendations': []
         }
-        
+
         try:
             # Extract numerical scores
             score_patterns = {
@@ -326,28 +325,28 @@ class OllamaClient:
                 'education_match': r'EDUCATION_MATCH:\s*(\d+)',
                 'overall_fit': r'OVERALL_FIT:\s*(\d+)'
             }
-            
+
             for key, pattern in score_patterns.items():
                 match = re.search(pattern, analysis, re.IGNORECASE)
                 if match:
                     result[key] = min(100, max(0, int(match.group(1))))
-            
+
             # Extract lists
             sections = {
                 'strengths': r'STRENGTHS:(.*?)(?=GAPS:|RECOMMENDATIONS:|$)',
                 'gaps': r'GAPS:(.*?)(?=RECOMMENDATIONS:|$)',
                 'recommendations': r'RECOMMENDATIONS:(.*?)$'
             }
-            
+
             for key, pattern in sections.items():
                 match = re.search(pattern, analysis, re.IGNORECASE | re.DOTALL)
                 if match:
                     items = re.findall(r'-\s*(.+)', match.group(1))
                     result[key] = [item.strip() for item in items if item.strip()]
-        
+
         except Exception as e:
             logger.error(f"Error parsing analysis: {e}")
-        
+
         return result
 
 class ResumeParser:
@@ -518,13 +517,17 @@ class MatchingEngine:
         """Calculate skills matching percentage"""
         if not job_skills:
             return 100.0
-        
-        resume_skills_lower = [skill.lower() for skill in resume_skills]
-        job_skills_lower = [skill.lower() for skill in job_skills]
-        
+
+        try:
+            resume_skills_lower = [str(skill).lower() for skill in resume_skills]
+            job_skills_lower = [str(skill).lower() for skill in job_skills]
+        except Exception as e:
+            logger.error(f"Skill lowercasing error: {e}")
+            return 0.0
+
         matches = sum(1 for skill in job_skills_lower if skill in resume_skills_lower)
         return (matches / len(job_skills_lower)) * 100
-    
+
     def _calculate_experience_match(self, resume_data: ResumeData, job_desc: JobDescription) -> float:
         """Calculate experience level match"""
         experience_levels = {
@@ -535,10 +538,16 @@ class MatchingEngine:
             'lead': (8, 15),
             'principal': (10, 20)
         }
-        
-        required_range = experience_levels.get(job_desc.experience_level.lower(), (0, 100))
+
+        try:
+            experience_key = str(job_desc.experience_level).lower()
+            required_range = experience_levels.get(experience_key, (0, 100))
+        except Exception as e:
+            logger.error(f"Experience level error: {e}")
+            required_range = (0, 100)
+
         candidate_years = resume_data.total_experience_years
-        
+
         if required_range[0] <= candidate_years <= required_range[1]:
             return 100.0
         elif candidate_years < required_range[0]:
@@ -561,16 +570,21 @@ class MatchingEngine:
         except Exception as e:
             logger.error(f"Text similarity calculation error: {e}")
             return 50.0
-    
+
     def _analyze_skills_gap(self, resume_skills: List[str], required_skills: List[str]) -> Tuple[List[str], List[str]]:
         """Analyze skills gap"""
-        resume_skills_lower = [skill.lower() for skill in resume_skills]
-        required_skills_lower = [skill.lower() for skill in required_skills]
-        
-        matching = [skill for skill in required_skills if skill.lower() in resume_skills_lower]
-        missing = [skill for skill in required_skills if skill.lower() not in resume_skills_lower]
-        
+        try:
+            resume_skills_lower = [str(skill).lower() for skill in resume_skills]
+            required_skills_lower = [str(skill).lower() for skill in required_skills]
+        except Exception as e:
+            logger.error(f"Skill gap analysis error: {e}")
+            return [], required_skills
+
+        matching = [skill for skill in required_skills_lower if skill in resume_skills_lower]
+        missing = [skill for skill in required_skills_lower if skill not in resume_skills_lower]
+
         return matching, missing
+
     
     def _resume_to_text(self, resume_data: ResumeData) -> str:
         """Convert resume data to text"""
