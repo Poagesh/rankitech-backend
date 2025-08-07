@@ -1,7 +1,8 @@
 # app/models.py
-from sqlalchemy import Column, Integer, String, Text, Float, Date, ForeignKey, LargeBinary, TIMESTAMP, func
+from sqlalchemy import Column, Integer, String, Text, Float, Date, ForeignKey, LargeBinary, TIMESTAMP, func, ARRAY, DateTime, JSON
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.ext.declarative import declarative_base
+from datetime import datetime
 
 Base = declarative_base()
 
@@ -84,6 +85,7 @@ class ConsultantProfile(Base):
     experiences = relationship("Experience", back_populates="profile", cascade="all, delete-orphan")
     achievements = relationship("Achievement", back_populates="profile", cascade="all, delete-orphan")
     extra_curricular_activities = relationship("ExtraCurricular", back_populates="profile", cascade="all, delete-orphan")
+    applications = relationship("JobApplication", back_populates="consultant", cascade="all, delete-orphan")
 
 
 # ---------- Education ----------
@@ -193,3 +195,51 @@ class Resume(Base):
     file_data = Column(LargeBinary, nullable=False)
     uploaded_at = Column(TIMESTAMP, server_default=func.now())
 
+#------------Post new job description----------
+
+class Job(Base):
+    __tablename__ = 'jobs'
+
+    id = Column(Integer, primary_key=True, index=True)
+    recruiter_id = Column(Integer, nullable=False)
+    job_title = Column(String, nullable=False)
+    experience_level = Column(String, nullable=False)
+    job_description = Column(Text)
+    location = Column(String)
+    employment_type = Column(String)
+    required_skills = Column(ARRAY(String))
+    preferred_skills = Column(ARRAY(String), nullable=True)
+    salary_range = Column(String)
+    deadline_to_apply = Column(DateTime, nullable=True)  
+    created_at = Column(TIMESTAMP, server_default=func.now())
+
+    applications = relationship("JobApplication", back_populates="job", cascade="all, delete-orphan")
+
+#------------ Job applications ----------
+class JobApplication(Base):
+    __tablename__ = "job_applications"
+
+    id = Column(Integer, primary_key=True, index=True)
+    job_id = Column(Integer, ForeignKey("jobs.id"), nullable=False)   # updated FK here
+    consultant_id = Column(Integer, ForeignKey("consultant_profiles.id"), nullable=False)
+    applied_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    # Relationships (optional)
+    job = relationship("Job", back_populates="applications")
+    consultant = relationship("ConsultantProfile", back_populates="applications")
+
+
+class RankedApplicantMatch(Base):
+    __tablename__ = "ranked_applicant_matches"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    job_id = Column(Integer, ForeignKey("jobs.id"), nullable=False)
+    consultant_id = Column(Integer, ForeignKey("consultant_profiles.id"), nullable=False)
+    match_score = Column(Float, nullable=False)
+    top_skills_matched = Column(JSON)
+    missing_skills = Column(JSON)
+    report = Column(Text)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    consultant = relationship("ConsultantProfile")
+    job = relationship("Job")

@@ -16,12 +16,12 @@ def create_recruiter(db: Session, recruiter: schemas.RecruiterCreate):
         name=recruiter.name,
         email=recruiter.email,
         password=hashed_password,
-        phone=recruiter.phone,
+        phone_number=recruiter.phone_number,
         designation=recruiter.designation,
         company_name=recruiter.company_name,
-        website=recruiter.website,
+        company_website=recruiter.company_website,
         industry=recruiter.industry,
-        type=recruiter.type
+        company_type=recruiter.company_type
     )
 
     db.add(db_recruiter)

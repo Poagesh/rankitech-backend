@@ -1,7 +1,7 @@
 # app/schemas.py
 from pydantic import BaseModel, EmailStr
 from typing import List, Optional
-from datetime import date
+from datetime import date, datetime
 from fastapi import UploadFile, File
 
 class RegisterInput(BaseModel):
@@ -197,3 +197,56 @@ class LoginResponse(BaseModel):
     token_type: str
     role: str
     user_id: int
+
+#--------------Job Description Schemas-------------
+class JobCreate(BaseModel):
+    recruiter_id: int
+    job_title: str
+    job_description: Optional[str] = None
+    location: Optional[str] = None
+    employment_type: Optional[str] = None
+    required_skills: List[str] = []
+    salary_range: Optional[str] = None
+    deadline_to_apply: Optional[datetime] = None  
+
+class JobResponse(JobCreate):
+    id: int
+    created_at: datetime  
+
+    class Config:
+        from_attributes = True
+
+#--------------Job Application Schemas-------------
+class JobApplicationCreate(BaseModel):
+    job_id: int
+    consultant_id: int
+
+class JobApplicationResponse(BaseModel):
+    id: int
+    job_id: int
+    consultant_id: int
+    applied_at: datetime
+
+    class Config:
+        from_attributes = True
+
+#-------------- Rank Job Application Schemas -------------
+
+class RankApplicantsRequest(BaseModel):
+    job_id: int
+
+class ApplicantRankedMatch(BaseModel):
+    consultant_id: int
+    consultant_name: str
+    match_score: float
+    top_skills_matched: List[str]
+    missing_skills: List[str]
+    report: str
+
+class RankedApplicantMatchInput(BaseModel):
+    job_id: int
+    consultant_id: int
+    match_score: float
+    top_skills_matched: List[str]
+    missing_skills: List[str]
+    report: str

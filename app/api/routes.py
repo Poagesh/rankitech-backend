@@ -1,22 +1,25 @@
 # app/api/routes.py
 import random
+import json
+import os
+import tempfile
+from io import BytesIO
+from datetime import datetime
+from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from starlette.responses import StreamingResponse
-from io import BytesIO
-import json
-from typing import List, Optional
 from sqlalchemy.orm import Session
-from app.database import SessionLocal
+from app import auth
 from app import models, schemas, tasks
-from app.models import ConsultantProfile, EducationDetail, Project, TechnicalSkill, Language, Subject, Experience, Achievement, ExtraCurricular, Resume
-from app.schemas import ProfileInput, ProfileResponse, EmailRequest, OTPVerifyRequest
+from app.database import SessionLocal
+from app.models import ConsultantProfile, EducationDetail, Project, TechnicalSkill, Language, Subject, Experience, Achievement, ExtraCurricular, Resume, Job, JobApplication, recruiter, RankedApplicantMatch
+from app.schemas import ProfileInput, ProfileResponse, EmailRequest, OTPVerifyRequest, JobCreate, JobResponse, JobApplicationCreate, JobApplicationResponse, RankApplicantsRequest, ApplicantRankedMatch
 from app.tasks import send_email_task
 from app.redis_manager import get_redis
 from app.config import settings
 from app.crud import create_recruiter
+from app.resume_matcher import ResumeJDMatcher, JobDescription
 from passlib.context import CryptContext
-from datetime import datetime
-from app import auth
 from passlib.hash import bcrypt
 
 
@@ -273,3 +276,140 @@ def get_resume(consultant_id: int, db: Session = Depends(get_db)):
     return StreamingResponse(BytesIO(resume.file_data), media_type=resume.file_type, headers={
         "Content-Disposition": f"attachment; filename={resume.file_name}"
     })
+
+#---------- new job description ----------
+@router.post("/new-job", response_model=JobResponse)
+def post_job(job: JobCreate, db: Session = Depends(get_db)):
+    new_job = Job(**job.dict())
+    db.add(new_job)
+    db.commit()
+    db.refresh(new_job)
+    return new_job
+
+@router.get("/jobs/", response_model=List[JobResponse])
+def get_jobs(db: Session = Depends(get_db)):
+    return db.query(Job).all()
+
+@router.get("/jobs/{job_id}", response_model=JobResponse)
+def get_job(job_id: int, db: Session = Depends(get_db)):
+    job = db.query(Job).filter(Job.id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return job
+
+#---------- Apply for Job ----------
+@router.post("/apply", response_model=JobApplicationResponse)
+def apply_to_job(application: JobApplicationCreate, db: Session = Depends(get_db)):
+    # Check if job exists
+    job = db.query(Job).filter(Job.id == application.job_id).first()  # updated Job here
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    # Check if consultant exists
+    consultant = db.query(ConsultantProfile).filter(ConsultantProfile.id == application.consultant_id).first()
+    if not consultant:
+        raise HTTPException(status_code=404, detail="Consultant not found")
+
+    # Check if consultant already applied for this job
+    existing_application = (
+        db.query(JobApplication)
+        .filter(
+            JobApplication.job_id == application.job_id,
+            JobApplication.consultant_id == application.consultant_id
+        )
+        .first()
+    )
+    if existing_application:
+        raise HTTPException(status_code=400, detail="You have already applied to this job")
+
+    # Create new application
+    new_application = JobApplication(job_id=application.job_id, consultant_id=application.consultant_id)
+    db.add(new_application)
+    db.commit()
+    db.refresh(new_application)
+
+    return new_application
+
+#---------- Rank job applications ----------
+@router.post("/rank-job-applicants", response_model=List[ApplicantRankedMatch])
+def rank_job_applicants(request: RankApplicantsRequest, db: Session = Depends(get_db)):
+    job = db.query(Job).filter(Job.id == request.job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found.")
+
+    applications = db.query(JobApplication).filter(JobApplication.job_id == job.id).all()
+    if not applications:
+        raise HTTPException(status_code=404, detail="No applicants found for this job.")
+
+    recruiter_obj = db.query(recruiter).filter(recruiter.id == job.recruiter_id).first() if job.recruiter_id else None
+
+    job_input = JobDescription(
+        title=job.job_title,
+        company=recruiter_obj.company_name if recruiter_obj else "YourCompany",
+        description=job.job_description or "",
+        required_skills=job.required_skills or [],
+        preferred_skills=job.preferred_skills or [],
+        experience_level=getattr(job, "experience_level", "Any"),
+        location=job.location or "Remote"
+    )
+
+    matcher = ResumeJDMatcher(model="gemma2:1b")
+    results = []
+
+    # Optional: Clear previous matches for this job
+    db.query(RankedApplicantMatch).filter(RankedApplicantMatch.job_id == job.id).delete()
+
+    for application in applications:
+        consultant = db.query(ConsultantProfile).filter(ConsultantProfile.id == application.consultant_id).first()
+        resume = (
+            db.query(Resume)
+            .filter(Resume.consultant_id == application.consultant_id)
+            .order_by(Resume.uploaded_at.desc())
+            .first()
+        )
+
+        if not resume or not resume.file_data:
+            continue
+
+        # Save binary data to a temporary file
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+            tmp_file.write(resume.file_data)
+            tmp_file_path = tmp_file.name
+
+        try:
+            result = matcher.match_resume_to_job(tmp_file_path, job_input)
+            report = matcher.generate_report(result, matcher.process_resume(tmp_file_path), job_input)
+
+            db_match = RankedApplicantMatch(
+                job_id=job.id,
+                consultant_id=consultant.id,
+                match_score=result["score"],
+                top_skills_matched=result["skills_matched"],
+                missing_skills=result["skills_missing"],
+                report=report,
+                created_at=datetime.utcnow()
+            )
+            db.add(db_match)
+
+            results.append(ApplicantRankedMatch(
+                consultant_id=consultant.id,
+                consultant_name=consultant.name,
+                match_score=result["score"],
+                top_skills_matched=result["skills_matched"],
+                missing_skills=result["skills_missing"],
+                report=report
+            ))
+
+        except Exception as e:
+            print(f"Error processing consultant {consultant.id}: {e}")
+            continue
+
+        finally:
+            # Clean up the temporary file
+            if os.path.exists(tmp_file_path):
+                os.remove(tmp_file_path)
+
+    db.commit()
+
+    results.sort(key=lambda x: x.match_score, reverse=True)
+    return results
