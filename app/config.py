@@ -14,5 +14,6 @@ class Settings:
     SMTP_USER = os.getenv("SMTP_USER")
     SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
     FROM_EMAIL = os.getenv("FROM_EMAIL", "noreply@example.com")
+    SMTP_API_PORT = int(os.getenv("SMTP_API_PORT", 587))
 
 settings = Settings()

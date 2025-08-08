@@ -419,3 +419,13 @@ def rank_job_applicants(request: RankApplicantsRequest, db: Session = Depends(ge
     db.commit()
     results.sort(key=lambda x: x.match_score, reverse=True)
     return results
+
+#---------- Test Email ----------
+@router.post("/test-email")
+def test_email():
+    send_email_task.delay(
+        to_email="poageshn@gmail.com",
+        subject="Test Email from Celery",
+        message="Hello! This is a test email sent from Celery via FastAPI."
+    )
+    return {"status": "email task dispatched"}
