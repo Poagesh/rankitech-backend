@@ -218,6 +218,43 @@ class ProfileResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class ConsultantProfileUpdate(BaseModel):
+    name: Optional[str] = None
+    dob: Optional[date] = None
+    gender: Optional[str] = None
+    college: Optional[str] = None
+    institution_roll_no: Optional[str] = None
+    primary_email: Optional[str] = None
+    personal_email: Optional[str] = None
+    mobile_no: Optional[str] = None
+    password: Optional[str] = None
+    country: Optional[str] = None
+    pincode: Optional[str] = None
+    state: Optional[str] = None
+    district: Optional[str] = None
+    city: Optional[str] = None
+    address_line: Optional[str] = None
+
+class ConsultantProfileResponse(BaseModel):
+    id: int
+    name: str
+    dob: Optional[date]
+    gender: Optional[str]
+    college: Optional[str]
+    institution_roll_no: Optional[str]
+    primary_email: str
+    personal_email: Optional[str]
+    mobile_no: Optional[str]
+    country: Optional[str]
+    pincode: Optional[str]
+    state: Optional[str]
+    district: Optional[str]
+    city: Optional[str]
+    address_line: Optional[str]
+
+    class Config:
+        orm_mode = True
+
 
 #--------------OTP Verification Schemas-------------
 

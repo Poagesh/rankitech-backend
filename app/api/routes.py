@@ -17,8 +17,50 @@ from sqlalchemy import update, delete
 from app.auth import create_access_token, verify_access_token
 from app import models, schemas, tasks
 from app.database import SessionLocal
-from app.models import ConsultantProfile, EducationDetail, Project, TechnicalSkill, Language, Subject, Experience, Achievement, ExtraCurricular, Resume, Job, JobApplication, recruiter, RankedApplicantMatch, admin, MatchResult
-from app.schemas import ProfileInput, ProfileResponse, EmailRequest, OTPVerifyRequest, JobCreate, JobResponse, JobApplicationCreate, JobApplicationResponse, JobApplicationUpdate, RankApplicantsRequest, ApplicantRankedMatch, AdminCreate, AdminUpdate, AdminResponse, RecruiterResponse, RecruiterUpdate, JobUpdate, MatchResultCreate, MatchResultUpdate, MatchResultOut, JobDescription, RankedApplicantMatchResponse, RankedApplicantMatchUpdate, RankedApplicantMatchCreate
+from app.models import (ConsultantProfile, 
+                        EducationDetail, 
+                        Project, 
+                        TechnicalSkill, 
+                        Language, 
+                        Subject, 
+                        Experience, 
+                        Achievement, 
+                        ExtraCurricular, 
+                        Resume, 
+                        Job, 
+                        JobApplication, 
+                        recruiter, 
+                        RankedApplicantMatch, 
+                        admin, 
+                        MatchResult)
+from app.schemas import (
+    ProfileInput,
+    ProfileResponse,
+    EmailRequest,
+    OTPVerifyRequest,
+    JobCreate,
+    JobResponse,
+    JobApplicationCreate,
+    JobApplicationResponse,
+    JobApplicationUpdate,
+    RankApplicantsRequest,
+    ApplicantRankedMatch,
+    AdminCreate,
+    AdminUpdate,
+    AdminResponse,
+    RecruiterResponse,
+    RecruiterUpdate,
+    JobUpdate,
+    MatchResultCreate,
+    MatchResultUpdate,
+    MatchResultOut,
+    JobDescription,
+    RankedApplicantMatchResponse,
+    RankedApplicantMatchUpdate,
+    RankedApplicantMatchCreate,
+    ConsultantProfileUpdate,
+    ConsultantProfileResponse,
+)
 from app.tasks import send_email_task
 from app.redis_manager import get_redis
 from app.config import settings
@@ -292,6 +334,69 @@ async def create_profile(
     db.refresh(profile)
 
     return profile
+
+def get_consultant_profile_by_id(id: int, db: Session):
+    profile = db.query(ConsultantProfile).filter(ConsultantProfile.id == id).first()
+    return profile
+
+def get_all_consultant_profiles(db: Session):
+    profiles = db.query(ConsultantProfile).all()
+    return profiles
+
+def update_consultant_profile(id: int, profile: ConsultantProfileUpdate, db: Session):
+    db_profile = db.query(ConsultantProfile).filter(ConsultantProfile.id == id).first()
+    if not db_profile:
+        raise HTTPException(status_code=404, detail="ConsultantProfile not found")
+
+    update_data = profile.dict(exclude_unset=True)
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields provided for update")
+
+    # Check for email uniqueness if primary_email is updated
+    if "primary_email" in update_data and update_data["primary_email"] != db_profile.primary_email:
+        existing = db.query(ConsultantProfile).filter(ConsultantProfile.primary_email == update_data["primary_email"]).first()
+        if existing:
+            raise HTTPException(status_code=400, detail="Email already registered")
+
+    # Hash password if provided
+    if "password" in update_data:
+        update_data["password"] = pwd_context.hash(update_data["password"])
+
+    for key, value in update_data.items():
+        setattr(db_profile, key, value)
+
+    db.commit()
+    db.refresh(db_profile)
+    return db_profile
+
+def delete_consultant_profile(id: int, db: Session):
+    profile = db.query(ConsultantProfile).filter(ConsultantProfile.id == id).first()
+    if not profile:
+        raise HTTPException(status_code=404, detail="ConsultantProfile not found")
+    db.delete(profile)
+    db.commit()
+
+@router.get("/consultant_profiles", response_model=List[ConsultantProfileResponse])
+def read_all_consultant_profiles(db: Session = Depends(get_db)):
+    profiles = get_all_consultant_profiles(db)
+    return profiles
+
+@router.get("/consultant_profiles/{id}", response_model=ConsultantProfileResponse)
+def read_consultant_profile(id: int, db: Session = Depends(get_db)):
+    profile = get_consultant_profile_by_id(id, db)
+    if not profile:
+        raise HTTPException(status_code=404, detail="ConsultantProfile not found")
+    return profile
+
+@router.put("/consultant_profiles/{id}", response_model=ConsultantProfileResponse)
+def update_consultant_profile_endpoint(id: int, profile: ConsultantProfileUpdate, db: Session = Depends(get_db)):
+    updated_profile = update_consultant_profile(id, profile, db)
+    return updated_profile
+
+@router.delete("/consultant_profiles/{id}", status_code=204)
+def delete_consultant_profile_endpoint(id: int, db: Session = Depends(get_db)):
+    delete_consultant_profile(id, db)
+    return {"detail": "ConsultantProfile deleted"}
 
 #-------------OTP Generation and Email Sending-------------
 @router.post("/send-otp")
