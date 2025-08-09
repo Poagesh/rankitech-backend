@@ -11,11 +11,14 @@ from fastapi.security import OAuth2PasswordBearer
 from starlette.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy import update, delete
 from app.auth import create_access_token, verify_access_token
 from app import models, schemas, tasks
 from app.database import SessionLocal
-from app.models import ConsultantProfile, EducationDetail, Project, TechnicalSkill, Language, Subject, Experience, Achievement, ExtraCurricular, Resume, Job, JobApplication, recruiter, RankedApplicantMatch, admin
-from app.schemas import ProfileInput, ProfileResponse, EmailRequest, OTPVerifyRequest, JobCreate, JobResponse, JobApplicationCreate, JobApplicationResponse, RankApplicantsRequest, ApplicantRankedMatch, AdminCreate, AdminUpdate, AdminResponse, RecruiterResponse, RecruiterUpdate, JobUpdate
+from app.models import ConsultantProfile, EducationDetail, Project, TechnicalSkill, Language, Subject, Experience, Achievement, ExtraCurricular, Resume, Job, JobApplication, recruiter, RankedApplicantMatch, admin, MatchResult
+from app.schemas import ProfileInput, ProfileResponse, EmailRequest, OTPVerifyRequest, JobCreate, JobResponse, JobApplicationCreate, JobApplicationResponse, RankApplicantsRequest, ApplicantRankedMatch, AdminCreate, AdminUpdate, AdminResponse, RecruiterResponse, RecruiterUpdate, JobUpdate, MatchResultCreate, MatchResultUpdate, MatchResultOut
 from app.tasks import send_email_task
 from app.redis_manager import get_redis
 from app.config import settings
@@ -160,10 +163,6 @@ def update_admin(admin_id: int, admin_update: AdminUpdate, db: Session = Depends
     admin.password = hashed_password
 
     update_data = admin_update.dict(exclude_unset=True)
-    if 'password' in update_data:
-        # In production, hash the new password
-        # update_data['password'] = hashpw(update_data['password'].encode('utf-8'), gensalt())
-        pass  # For now, plain as per model
     
     for key, value in update_data.items():
         setattr(admin, key, value)
@@ -626,3 +625,61 @@ def test_email():
         message="Hello! This is a test email sent from Celery via FastAPI."
     )
     return {"status": "email task dispatched"}
+
+#--------------CRUD for Match Result--------------
+async def create_match_result(match_result: MatchResultCreate, db: AsyncSession):
+    db_match_result = MatchResult(**match_result.dict())
+    db.add(db_match_result)
+    await db.commit()
+    await db.refresh(db_match_result)
+    return db_match_result
+
+async def get_match_result_by_id(id: int, db: AsyncSession):
+    result = await db.execute(select(MatchResult).filter(MatchResult.id == id))
+    return result.scalars().first()
+
+async def get_all_match_results(db: AsyncSession):
+    result = await db.execute(select(MatchResult))
+    return result.scalars().all()
+
+async def update_match_result(id: int, match_result: MatchResultUpdate, db: AsyncSession):
+    update_data = match_result.dict(exclude_unset=True)
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields provided for update")
+    await db.execute(update(MatchResult).where(MatchResult.id == id).values(**update_data))
+    await db.commit()
+    return await get_match_result_by_id(id, db)
+
+async def delete_match_result(id: int, db: AsyncSession):
+    await db.execute(delete(MatchResult).where(MatchResult.id == id))
+    await db.commit()
+
+# FastAPI endpoints
+@router.get("/match_results", response_model=List[MatchResultOut])
+async def read_all_match_results(db: AsyncSession = Depends(get_db)):
+    match_results = await get_all_match_results(db)
+    return match_results
+
+@router.get("/match_results/{id}", response_model=MatchResultOut)
+async def read_match_result(id: int, db: AsyncSession = Depends(get_db)):
+    match_result = await get_match_result_by_id(id, db)
+    if not match_result:
+        raise HTTPException(status_code=404, detail="MatchResult not found")
+    return match_result
+
+@router.put("/match_results/{id}", response_model=MatchResultOut)
+async def update_match_result_endpoint(id: int, match_result: MatchResultUpdate, db: AsyncSession = Depends(get_db)):
+    updated_match_result = await update_match_result(id, match_result, db)
+    if not updated_match_result:
+        raise HTTPException(status_code=404, detail="MatchResult not found")
+    return updated_match_result
+
+@router.delete("/match_results/{id}", status_code=204)
+async def delete_match_result_endpoint(id: int, db: AsyncSession = Depends(get_db)):
+    match_result = await get_match_result_by_id(id, db)
+    if not match_result:
+        raise HTTPException(status_code=404, detail="MatchResult not found")
+    await delete_match_result(id, db)
+    return {"detail": "MatchResult deleted"}
+
+

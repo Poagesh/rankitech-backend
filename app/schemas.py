@@ -316,3 +316,23 @@ class RankedApplicantMatchInput(BaseModel):
     top_skills_matched: List[str]
     missing_skills: List[str]
     report: str
+
+#--------------- CRUD for Match Results -------------
+class MatchResultCreate(BaseModel):
+    jd_id: int
+    profile_id: int
+    similarity_score: float
+
+class MatchResultUpdate(BaseModel):
+    jd_id: int | None = None
+    profile_id: int | None = None
+    similarity_score: float | None = None
+
+class MatchResultOut(BaseModel):
+    id: int
+    jd_id: int
+    profile_id: int
+    similarity_score: float
+
+    class Config:
+        from_attributes = True
