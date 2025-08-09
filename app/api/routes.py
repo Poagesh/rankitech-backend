@@ -15,7 +15,7 @@ from app.auth import create_access_token, verify_access_token
 from app import models, schemas, tasks
 from app.database import SessionLocal
 from app.models import ConsultantProfile, EducationDetail, Project, TechnicalSkill, Language, Subject, Experience, Achievement, ExtraCurricular, Resume, Job, JobApplication, recruiter, RankedApplicantMatch, admin
-from app.schemas import ProfileInput, ProfileResponse, EmailRequest, OTPVerifyRequest, JobCreate, JobResponse, JobApplicationCreate, JobApplicationResponse, RankApplicantsRequest, ApplicantRankedMatch, AdminCreate, AdminUpdate, AdminResponse, RecruiterResponse, RecruiterUpdate
+from app.schemas import ProfileInput, ProfileResponse, EmailRequest, OTPVerifyRequest, JobCreate, JobResponse, JobApplicationCreate, JobApplicationResponse, RankApplicantsRequest, ApplicantRankedMatch, AdminCreate, AdminUpdate, AdminResponse, RecruiterResponse, RecruiterUpdate, JobUpdate
 from app.tasks import send_email_task
 from app.redis_manager import get_redis
 from app.config import settings
@@ -457,6 +457,42 @@ def get_job(job_id: int, db: Session = Depends(get_db)):
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     return job
+
+def update_job(db: Session, job_id: int, job_update: JobUpdate):
+    db_job = db.query(Job).filter(Job.id == job_id).first()
+    if db_job is None:
+        return None
+    
+    update_data = job_update.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(db_job, key, value)
+    
+    db.commit()
+    db.refresh(db_job)
+    return db_job
+
+def delete_job(db: Session, job_id: int):
+    db_job = db.query(Job).filter(Job.id == job_id).first()
+    if db_job is None:
+        return None
+    db.delete(db_job)
+    db.commit()
+    return db_job
+
+# Endpoints (PUT and DELETE)
+@router.put("/jobs/{job_id}", response_model=JobResponse)
+def update_job_endpoint(job_id: int, job_update: JobUpdate, db: Session = Depends(get_db)):
+    updated_job = update_job(db, job_id, job_update)
+    if updated_job is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+    return updated_job
+
+@router.delete("/jobs/{job_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_job_endpoint(job_id: int, db: Session = Depends(get_db)):
+    deleted_job = delete_job(db, job_id)
+    if deleted_job is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+    return None
 
 #---------- Apply for Job ----------
 @router.post("/apply", response_model=JobApplicationResponse)

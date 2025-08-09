@@ -271,6 +271,17 @@ class JobResponse(JobCreate):
     class Config:
         from_attributes = True
 
+class JobUpdate(BaseModel):
+    job_title: Optional[str]
+    experience_level: Optional[str]
+    job_description: Optional[str]
+    location: Optional[str]
+    employment_type: Optional[str]
+    required_skills: Optional[List[str]]
+    preferred_skills: Optional[List[str]]
+    salary_range: Optional[str]
+    deadline_to_apply: Optional[datetime]
+
 #--------------Job Application Schemas-------------
 class JobApplicationCreate(BaseModel):
     job_id: int
