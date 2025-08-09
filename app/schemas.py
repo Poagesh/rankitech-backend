@@ -10,6 +10,7 @@ class RegisterInput(BaseModel):
     password: str
     role: str
 
+#-------------CRUD Recruiter-------------
 class RecruiterCreate(BaseModel):
     name: str
     email: EmailStr
@@ -20,11 +21,31 @@ class RecruiterCreate(BaseModel):
     company_website: Optional[str]
     industry: str
     company_type: str
+class RecruiterUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    password: Optional[str] = None  # If provided, hash before updating
+    phone_number: Optional[str] = None
+    company_name: Optional[str] = None
+    designation: Optional[str] = None
+    company_website: Optional[str] = None
+    industry: Optional[str] = None
+    company_type: Optional[str] = None
 
-class JDInput(BaseModel):
-    title: str
-    content: str
+class RecruiterResponse(BaseModel):
+    id: int
+    name: str
+    email: str
+    phone_number: str
+    company_name: str
+    designation: str
+    company_website: Optional[str]
+    industry: str
+    company_type: str
+    # Exclude password for security in responses
 
+    class Config:
+        from_attributes = True
 
 #------------CRUD admin -----------------
 class AdminCreate(BaseModel):

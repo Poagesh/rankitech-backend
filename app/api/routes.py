@@ -15,7 +15,7 @@ from app.auth import create_access_token, verify_access_token
 from app import models, schemas, tasks
 from app.database import SessionLocal
 from app.models import ConsultantProfile, EducationDetail, Project, TechnicalSkill, Language, Subject, Experience, Achievement, ExtraCurricular, Resume, Job, JobApplication, recruiter, RankedApplicantMatch, admin
-from app.schemas import ProfileInput, ProfileResponse, EmailRequest, OTPVerifyRequest, JobCreate, JobResponse, JobApplicationCreate, JobApplicationResponse, RankApplicantsRequest, ApplicantRankedMatch, AdminCreate, AdminUpdate, AdminResponse
+from app.schemas import ProfileInput, ProfileResponse, EmailRequest, OTPVerifyRequest, JobCreate, JobResponse, JobApplicationCreate, JobApplicationResponse, RankApplicantsRequest, ApplicantRankedMatch, AdminCreate, AdminUpdate, AdminResponse, RecruiterResponse, RecruiterUpdate
 from app.tasks import send_email_task
 from app.redis_manager import get_redis
 from app.config import settings
@@ -55,6 +55,67 @@ def add_jd(jd: schemas.JDInput, email: str, db: Session = Depends(get_db)):
 def register_recruiter(recruiter: schemas.RecruiterCreate, db: Session = Depends(get_db)):
     return create_recruiter(db, recruiter)
 
+def get_recruiters(db: Session, skip: int = 0, limit: int = 10):
+    return db.query(recruiter).offset(skip).limit(limit).all()
+
+def get_recruiter(db: Session, recruiter_id: int):
+    return db.query(recruiter).filter(recruiter.id == recruiter_id).first()
+
+def update_recruiter(db: Session, recruiter_id: int, recruiter_update: RecruiterUpdate):
+    db_recruiter = get_recruiter(db, recruiter_id)
+    if db_recruiter is None:
+        return None
+    
+    update_data = recruiter_update.dict(exclude_unset=True)
+    if 'password' in update_data:
+        hashed_password = bcrypt.hash(recruiter_update.password)
+        update_data['password'] = hashed_password
+    
+    for key, value in update_data.items():
+        setattr(db_recruiter, key, value)
+    
+    try:
+        db.commit()
+        db.refresh(db_recruiter)
+        return db_recruiter
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already exists")
+
+def delete_recruiter(db: Session, recruiter_id: int):
+    db_recruiter = get_recruiter(db, recruiter_id)
+    if db_recruiter is None:
+        return None
+    db.delete(db_recruiter)
+    db.commit()
+    return db_recruiter
+
+# Endpoints (GET, GET by ID, PUT, DELETE)
+@router.get("/recruiters", response_model=List[RecruiterResponse])
+def read_recruiters(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    recruiters = get_recruiters(db, skip=skip, limit=limit)
+    return recruiters
+
+@router.get("/get-recruiter/{recruiter_id}", response_model=RecruiterResponse)
+def read_recruiter(recruiter_id: int, db: Session = Depends(get_db)):
+    recruiter = get_recruiter(db, recruiter_id)
+    if recruiter is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recruiter not found")
+    return recruiter
+
+@router.put("/put-recruiter/{recruiter_id}", response_model=RecruiterResponse)
+def update_recruiter_endpoint(recruiter_id: int, recruiter_update: RecruiterUpdate, db: Session = Depends(get_db)):
+    updated_recruiter = update_recruiter(db, recruiter_id, recruiter_update)
+    if updated_recruiter is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recruiter not found")
+    return updated_recruiter
+
+@router.delete("/delete-recruiter/{recruiter_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_recruiter_endpoint(recruiter_id: int, db: Session = Depends(get_db)):
+    deleted_recruiter = delete_recruiter(db, recruiter_id)
+    if deleted_recruiter is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Recruiter not found")
+    return None
 #-------------Admin Registration-------------
 
 @router.get("/readadmins", response_model=List[AdminResponse])
