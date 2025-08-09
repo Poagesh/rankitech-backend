@@ -54,7 +54,6 @@ from app.schemas import (
     MatchResultCreate,
     MatchResultUpdate,
     MatchResultOut,
-    JobDescription,
     RankedApplicantMatchResponse,
     RankedApplicantMatchUpdate,
     RankedApplicantMatchCreate,
