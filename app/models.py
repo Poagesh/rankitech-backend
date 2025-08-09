@@ -229,7 +229,7 @@ class JobApplication(Base):
     job = relationship("Job", back_populates="applications")
     consultant = relationship("ConsultantProfile", back_populates="applications")
 
-
+#------------ Ranked Applicant Matches ----------
 class RankedApplicantMatch(Base):
     __tablename__ = "ranked_applicant_matches"
 

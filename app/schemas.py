@@ -287,6 +287,10 @@ class JobApplicationCreate(BaseModel):
     job_id: int
     consultant_id: int
 
+class JobApplicationUpdate(BaseModel):
+    job_id: int | None = None
+    consultant_id: int | None = None
+
 class JobApplicationResponse(BaseModel):
     id: int
     job_id: int

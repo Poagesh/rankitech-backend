@@ -18,7 +18,7 @@ from app.auth import create_access_token, verify_access_token
 from app import models, schemas, tasks
 from app.database import SessionLocal
 from app.models import ConsultantProfile, EducationDetail, Project, TechnicalSkill, Language, Subject, Experience, Achievement, ExtraCurricular, Resume, Job, JobApplication, recruiter, RankedApplicantMatch, admin, MatchResult
-from app.schemas import ProfileInput, ProfileResponse, EmailRequest, OTPVerifyRequest, JobCreate, JobResponse, JobApplicationCreate, JobApplicationResponse, RankApplicantsRequest, ApplicantRankedMatch, AdminCreate, AdminUpdate, AdminResponse, RecruiterResponse, RecruiterUpdate, JobUpdate, MatchResultCreate, MatchResultUpdate, MatchResultOut
+from app.schemas import ProfileInput, ProfileResponse, EmailRequest, OTPVerifyRequest, JobCreate, JobResponse, JobApplicationCreate, JobApplicationResponse, JobApplicationUpdate, RankApplicantsRequest, ApplicantRankedMatch, AdminCreate, AdminUpdate, AdminResponse, RecruiterResponse, RecruiterUpdate, JobUpdate, MatchResultCreate, MatchResultUpdate, MatchResultOut
 from app.tasks import send_email_task
 from app.redis_manager import get_redis
 from app.config import settings
@@ -44,14 +44,14 @@ def get_db():
     finally:
         db.close()
 
-@router.post("/jd/")
-def add_jd(jd: schemas.JDInput, email: str, db: Session = Depends(get_db)):
-    new_jd = models.JobDescription(**jd.dict())
-    db.add(new_jd)
-    db.commit()
-    db.refresh(new_jd)
-    tasks.process_matching.delay(new_jd.id, email)
-    return {"msg": "JD added and processing started"}
+# @router.post("/jd/")
+# def add_jd(jd: schemas.JDInput, email: str, db: Session = Depends(get_db)):
+#     new_jd = models.JobDescription(**jd.dict())
+#     db.add(new_jd)
+#     db.commit()
+#     db.refresh(new_jd)
+#     tasks.process_matching.delay(new_jd.id, email)
+#     return {"msg": "JD added and processing started"}
 
 #-------------Recruiter Registration-------------
 @router.post("/register-recruiter", response_model=schemas.RecruiterCreate)
@@ -494,6 +494,63 @@ def delete_job_endpoint(job_id: int, db: Session = Depends(get_db)):
     return None
 
 #---------- Apply for Job ----------
+def get_job_application_by_id(id: int, db: Session):
+    application = db.query(JobApplication).filter(JobApplication.id == id).first()
+    return application
+
+def get_all_job_applications(db: Session):
+    applications = db.query(JobApplication).all()
+    return applications
+
+def update_job_application(id: int, application: JobApplicationUpdate, db: Session):
+    db_application = db.query(JobApplication).filter(JobApplication.id == id).first()
+    if not db_application:
+        raise HTTPException(status_code=404, detail="JobApplication not found")
+    
+    update_data = application.dict(exclude_unset=True)
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields provided for update")
+    
+    # Validate job_id if provided
+    if "job_id" in update_data:
+        job = db.query(Job).filter(Job.id == update_data["job_id"]).first()
+        if not job:
+            raise HTTPException(status_code=404, detail="Job not found")
+    
+    # Validate consultant_id if provided
+    if "consultant_id" in update_data:
+        consultant = db.query(ConsultantProfile).filter(ConsultantProfile.id == update_data["consultant_id"]).first()
+        if not consultant:
+            raise HTTPException(status_code=404, detail="Consultant not found")
+    
+    # Check for duplicate application if job_id and consultant_id are updated
+    if "job_id" in update_data and "consultant_id" in update_data:
+        existing_application = (
+            db.query(JobApplication)
+            .filter(
+                JobApplication.job_id == update_data["job_id"],
+                JobApplication.consultant_id == update_data["consultant_id"],
+                JobApplication.id != id
+            )
+            .first()
+        )
+        if existing_application:
+            raise HTTPException(status_code=400, detail="Consultant already applied to this job")
+
+    for key, value in update_data.items():
+        setattr(db_application, key, value)
+    
+    db.commit()
+    db.refresh(db_application)
+    return db_application
+
+def delete_job_application(id: int, db: Session):
+    application = db.query(JobApplication).filter(JobApplication.id == id).first()
+    if not application:
+        raise HTTPException(status_code=404, detail="JobApplication not found")
+    db.delete(application)
+    db.commit()
+
 @router.post("/apply", response_model=JobApplicationResponse)
 def apply_to_job(application: JobApplicationCreate, db: Session = Depends(get_db)):
     # Check if job exists
@@ -525,6 +582,29 @@ def apply_to_job(application: JobApplicationCreate, db: Session = Depends(get_db
     db.refresh(new_application)
 
     return new_application
+
+
+@router.get("/job_applications", response_model=List[JobApplicationResponse])
+def read_all_job_applications(db: Session = Depends(get_db)):
+    applications = get_all_job_applications(db)
+    return applications
+
+@router.get("/job_applications/{id}", response_model=JobApplicationResponse)
+def read_job_application(id: int, db: Session = Depends(get_db)):
+    application = get_job_application_by_id(id, db)
+    if not application:
+        raise HTTPException(status_code=404, detail="JobApplication not found")
+    return application
+
+@router.put("/job_applications/{id}", response_model=JobApplicationResponse)
+def update_job_application_endpoint(id: int, application: JobApplicationUpdate, db: Session = Depends(get_db)):
+    updated_application = update_job_application(id, application, db)
+    return updated_application
+
+@router.delete("/job_applications/{id}", status_code=204)
+def delete_job_application_endpoint(id: int, db: Session = Depends(get_db)):
+    delete_job_application(id, db)
+    return {"detail": "JobApplication deleted"}
 
 #---------- Rank job applications ----------
 @router.post("/rank-job-applicants", response_model=List[ApplicantRankedMatch])
