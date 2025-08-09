@@ -18,7 +18,7 @@ from app.auth import create_access_token, verify_access_token
 from app import models, schemas, tasks
 from app.database import SessionLocal
 from app.models import ConsultantProfile, EducationDetail, Project, TechnicalSkill, Language, Subject, Experience, Achievement, ExtraCurricular, Resume, Job, JobApplication, recruiter, RankedApplicantMatch, admin, MatchResult
-from app.schemas import ProfileInput, ProfileResponse, EmailRequest, OTPVerifyRequest, JobCreate, JobResponse, JobApplicationCreate, JobApplicationResponse, JobApplicationUpdate, RankApplicantsRequest, ApplicantRankedMatch, AdminCreate, AdminUpdate, AdminResponse, RecruiterResponse, RecruiterUpdate, JobUpdate, MatchResultCreate, MatchResultUpdate, MatchResultOut
+from app.schemas import ProfileInput, ProfileResponse, EmailRequest, OTPVerifyRequest, JobCreate, JobResponse, JobApplicationCreate, JobApplicationResponse, JobApplicationUpdate, RankApplicantsRequest, ApplicantRankedMatch, AdminCreate, AdminUpdate, AdminResponse, RecruiterResponse, RecruiterUpdate, JobUpdate, MatchResultCreate, MatchResultUpdate, MatchResultOut, JobDescription, RankedApplicantMatchResponse, RankedApplicantMatchUpdate, RankedApplicantMatchCreate
 from app.tasks import send_email_task
 from app.redis_manager import get_redis
 from app.config import settings
@@ -763,3 +763,118 @@ async def delete_match_result_endpoint(id: int, db: AsyncSession = Depends(get_d
     return {"detail": "MatchResult deleted"}
 
 
+#--------------------RankedApplicantMatch--------------------
+# CRUD operations
+def create_ranked_applicant_match(match: RankedApplicantMatchCreate, db: Session):
+    # Check if job exists
+    job = db.query(Job).filter(Job.id == match.job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+
+    # Check if consultant exists
+    consultant = db.query(ConsultantProfile).filter(ConsultantProfile.id == match.consultant_id).first()
+    if not consultant:
+        raise HTTPException(status_code=404, detail="Consultant not found")
+
+    # Check if match already exists for this job and consultant
+    existing_match = (
+        db.query(RankedApplicantMatch)
+        .filter(
+            RankedApplicantMatch.job_id == match.job_id,
+            RankedApplicantMatch.consultant_id == match.consultant_id
+        )
+        .first()
+    )
+    if existing_match:
+        raise HTTPException(status_code=400, detail="Ranked applicant match already exists for this job and consultant")
+
+    # Create new match
+    new_match = RankedApplicantMatch(**match.dict())
+    db.add(new_match)
+    db.commit()
+    db.refresh(new_match)
+    return new_match
+
+def get_ranked_applicant_match_by_id(id: int, db: Session):
+    match = db.query(RankedApplicantMatch).filter(RankedApplicantMatch.id == id).first()
+    return match
+
+def get_all_ranked_applicant_matches(db: Session):
+    matches = db.query(RankedApplicantMatch).all()
+    return matches
+
+def update_ranked_applicant_match(id: int, match: RankedApplicantMatchUpdate, db: Session):
+    db_match = db.query(RankedApplicantMatch).filter(RankedApplicantMatch.id == id).first()
+    if not db_match:
+        raise HTTPException(status_code=404, detail="RankedApplicantMatch not found")
+
+    update_data = match.dict(exclude_unset=True)
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields provided for update")
+
+    # Validate job_id if provided
+    if "job_id" in update_data:
+        job = db.query(Job).filter(Job.id == update_data["job_id"]).first()
+        if not job:
+            raise HTTPException(status_code=404, detail="Job not found")
+
+    # Validate consultant_id if provided
+    if "consultant_id" in update_data:
+        consultant = db.query(ConsultantProfile).filter(ConsultantProfile.id == update_data["consultant_id"]).first()
+        if not consultant:
+            raise HTTPException(status_code=404, detail="Consultant not found")
+
+    # Check for duplicate match if job_id and consultant_id are updated
+    if "job_id" in update_data and "consultant_id" in update_data:
+        existing_match = (
+            db.query(RankedApplicantMatch)
+            .filter(
+                RankedApplicantMatch.job_id == update_data["job_id"],
+                RankedApplicantMatch.consultant_id == update_data["consultant_id"],
+                RankedApplicantMatch.id != id
+            )
+            .first()
+        )
+        if existing_match:
+            raise HTTPException(status_code=400, detail="Ranked applicant match already exists for this job and consultant")
+
+    for key, value in update_data.items():
+        setattr(db_match, key, value)
+
+    db.commit()
+    db.refresh(db_match)
+    return db_match
+
+def delete_ranked_applicant_match(id: int, db: Session):
+    match = db.query(RankedApplicantMatch).filter(RankedApplicantMatch.id == id).first()
+    if not match:
+        raise HTTPException(status_code=404, detail="RankedApplicantMatch not found")
+    db.delete(match)
+    db.commit()
+
+# FastAPI endpoints
+@router.post("/ranked_applicant_matches", response_model=RankedApplicantMatchResponse)
+def create_ranked_applicant_match(match: RankedApplicantMatchCreate, db: Session = Depends(get_db)):
+    return create_ranked_applicant_match(match, db)
+
+@router.get("/ranked_applicant_matches", response_model=List[RankedApplicantMatchResponse])
+def read_all_ranked_applicant_matches(db: Session = Depends(get_db)):
+    matches = get_all_ranked_applicant_matches(db)
+    return matches
+
+@router.get("/ranked_applicant_matches/{id}", response_model=RankedApplicantMatchResponse)
+def read_ranked_applicant_match(id: int, db: Session = Depends(get_db)):
+    match = get_ranked_applicant_match_by_id(id, db)
+    if not match:
+        raise HTTPException(status_code=404, detail="RankedApplicantMatch not found")
+    return match
+
+@router.put("/ranked_applicant_matches/{id}", response_model=RankedApplicantMatchResponse)
+def update_ranked_applicant_match_endpoint(id: int, match: RankedApplicantMatchUpdate, db: Session = Depends(get_db)):
+    updated_match = update_ranked_applicant_match(id, match, db)
+    return updated_match
+
+@router.delete("/ranked_applicant_matches/{id}", status_code=204)
+def delete_ranked_applicant_match_endpoint(id: int, db: Session = Depends(get_db)):
+    delete_ranked_applicant_match(id, db)
+    return {"detail": "RankedApplicantMatch deleted"}

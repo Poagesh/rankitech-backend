@@ -1,6 +1,6 @@
 # app/schemas.py
 from pydantic import BaseModel, EmailStr
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from datetime import date, datetime
 from fastapi import UploadFile, File
 
@@ -337,6 +337,36 @@ class MatchResultOut(BaseModel):
     jd_id: int
     profile_id: int
     similarity_score: float
+
+    class Config:
+        from_attributes = True
+
+#--------------------RankedApplicantMatch--------------------
+class RankedApplicantMatchCreate(BaseModel):
+    job_id: int
+    consultant_id: int
+    match_score: float
+    top_skills_matched: Dict[str, Any] | None = None
+    missing_skills: Dict[str, Any] | None = None
+    report: str | None = None
+
+class RankedApplicantMatchUpdate(BaseModel):
+    job_id: int | None = None
+    consultant_id: int | None = None
+    match_score: float | None = None
+    top_skills_matched: Dict[str, Any] | None = None
+    missing_skills: Dict[str, Any] | None = None
+    report: str | None = None
+
+class RankedApplicantMatchResponse(BaseModel):
+    id: int
+    job_id: int
+    consultant_id: int
+    match_score: float
+    top_skills_matched: Dict[str, Any] | None
+    missing_skills: Dict[str, Any] | None
+    report: str | None
+    created_at: datetime
 
     class Config:
         from_attributes = True
