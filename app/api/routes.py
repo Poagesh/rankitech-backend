@@ -10,11 +10,12 @@ from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File,
 from fastapi.security import OAuth2PasswordBearer
 from starlette.responses import StreamingResponse
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from app.auth import create_access_token, verify_access_token
 from app import models, schemas, tasks
 from app.database import SessionLocal
 from app.models import ConsultantProfile, EducationDetail, Project, TechnicalSkill, Language, Subject, Experience, Achievement, ExtraCurricular, Resume, Job, JobApplication, recruiter, RankedApplicantMatch, admin
-from app.schemas import ProfileInput, ProfileResponse, EmailRequest, OTPVerifyRequest, JobCreate, JobResponse, JobApplicationCreate, JobApplicationResponse, RankApplicantsRequest, ApplicantRankedMatch
+from app.schemas import ProfileInput, ProfileResponse, EmailRequest, OTPVerifyRequest, JobCreate, JobResponse, JobApplicationCreate, JobApplicationResponse, RankApplicantsRequest, ApplicantRankedMatch, AdminCreate, AdminUpdate, AdminResponse
 from app.tasks import send_email_task
 from app.redis_manager import get_redis
 from app.config import settings
@@ -56,6 +57,18 @@ def register_recruiter(recruiter: schemas.RecruiterCreate, db: Session = Depends
 
 #-------------Admin Registration-------------
 
+@router.get("/readadmins", response_model=List[AdminResponse])
+def read_admins(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+    admins = db.query(models.admin).offset(skip).limit(limit).all()
+    return admins
+
+@router.get("/readadmin/{admin_id}", response_model=AdminResponse)
+def read_admin(admin_id: int, db: Session = Depends(get_db)):
+    admin = db.query(models.admin).filter(models.admin.id == admin_id).first()
+    if admin is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Admin not found")
+    return admin
+
 @router.post("/createAdmin")
 def create_admin(admin_data: schemas.AdminCreate, db: Session = Depends(get_db)):
     existing_admin = db.query(models.admin).filter(models.admin.email == admin_data.email).first()
@@ -74,6 +87,42 @@ def create_admin(admin_data: schemas.AdminCreate, db: Session = Depends(get_db))
     db.commit()
     db.refresh(new_admin)
     return {"id": new_admin.id, "name": new_admin.name, "email": new_admin.email}
+
+
+@router.put("/update-admin/{admin_id}", response_model=AdminResponse)
+def update_admin(admin_id: int, admin_update: AdminUpdate, db: Session = Depends(get_db)):
+    admin = db.query(models.admin).filter(models.admin.id == admin_id).first()
+    if admin is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Admin not found")
+
+    hashed_password = bcrypt.hash(admin_update.password)
+    admin.password = hashed_password
+
+    update_data = admin_update.dict(exclude_unset=True)
+    if 'password' in update_data:
+        # In production, hash the new password
+        # update_data['password'] = hashpw(update_data['password'].encode('utf-8'), gensalt())
+        pass  # For now, plain as per model
+    
+    for key, value in update_data.items():
+        setattr(admin, key, value)
+    
+    try:
+        db.commit()
+        db.refresh(admin)
+        return admin
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already exists")
+    
+@router.delete("/delete-admin/{admin_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_admin(admin_id: int, db: Session = Depends(get_db)):
+    admin = db.query(models.admin).filter(models.admin.id == admin_id).first()
+    if admin is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Admin not found")
+    db.delete(admin)
+    db.commit()
+    return None
 
 
 # @router.post("/ar/register", response_model=ProfileResponse)

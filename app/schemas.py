@@ -26,11 +26,25 @@ class JDInput(BaseModel):
     content: str
 
 
-#------------add admin -----------------
+#------------CRUD admin -----------------
 class AdminCreate(BaseModel):
     name: str
     email: EmailStr
     password: str
+
+class AdminUpdate(BaseModel):
+    name: str | None = None
+    email: str | None = None
+    password: str | None = None  # If updating, hash if provided
+
+class AdminResponse(BaseModel):
+    id: int
+    name: str
+    email: str
+    # Exclude password for security in responses
+
+    class Config:
+        from_attributes = True
 
 # ---------- Nested Schemas for Related Tables ----------
 
