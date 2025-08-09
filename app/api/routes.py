@@ -6,13 +6,14 @@ import tempfile
 from io import BytesIO
 from datetime import datetime
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form, Header
+from fastapi.security import OAuth2PasswordBearer
 from starlette.responses import StreamingResponse
 from sqlalchemy.orm import Session
-from app import auth
+from app.auth import create_access_token, verify_access_token
 from app import models, schemas, tasks
 from app.database import SessionLocal
-from app.models import ConsultantProfile, EducationDetail, Project, TechnicalSkill, Language, Subject, Experience, Achievement, ExtraCurricular, Resume, Job, JobApplication, recruiter, RankedApplicantMatch
+from app.models import ConsultantProfile, EducationDetail, Project, TechnicalSkill, Language, Subject, Experience, Achievement, ExtraCurricular, Resume, Job, JobApplication, recruiter, RankedApplicantMatch, admin
 from app.schemas import ProfileInput, ProfileResponse, EmailRequest, OTPVerifyRequest, JobCreate, JobResponse, JobApplicationCreate, JobApplicationResponse, RankApplicantsRequest, ApplicantRankedMatch
 from app.tasks import send_email_task
 from app.redis_manager import get_redis
@@ -30,6 +31,8 @@ router = APIRouter()
 # Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
 def get_db():
     db = SessionLocal()
     try:
@@ -46,9 +49,32 @@ def add_jd(jd: schemas.JDInput, email: str, db: Session = Depends(get_db)):
     tasks.process_matching.delay(new_jd.id, email)
     return {"msg": "JD added and processing started"}
 
+#-------------Recruiter Registration-------------
 @router.post("/register-recruiter", response_model=schemas.RecruiterCreate)
 def register_recruiter(recruiter: schemas.RecruiterCreate, db: Session = Depends(get_db)):
     return create_recruiter(db, recruiter)
+
+#-------------Admin Registration-------------
+
+@router.post("/createAdmin")
+def create_admin(admin_data: schemas.AdminCreate, db: Session = Depends(get_db)):
+    existing_admin = db.query(models.admin).filter(models.admin.email == admin_data.email).first()
+    if existing_admin:
+        raise HTTPException(status_code=400, detail="Admin with this email already exists")
+
+    hashed_password = bcrypt.hash(admin_data.password)
+
+    new_admin = models.admin(
+        name=admin_data.name,
+        email=admin_data.email,
+        password=hashed_password
+    )
+
+    db.add(new_admin)
+    db.commit()
+    db.refresh(new_admin)
+    return {"id": new_admin.id, "name": new_admin.name, "email": new_admin.email}
+
 
 # @router.post("/ar/register", response_model=ProfileResponse)
 # def register_consultant_profile(profile_in: ProfileInput, db: Session = Depends(get_db)):
@@ -158,19 +184,6 @@ async def create_profile(
 
     return profile
 
-# ---------- Get All Profiles ----------
-@router.get("/profiles/", response_model=List[ProfileResponse])
-def get_profiles(db: Session = Depends(get_db)):
-    return db.query(ConsultantProfile).all()
-
-# ---------- Get Single Profile ----------
-@router.get("/profiles/{profile_id}", response_model=ProfileResponse)
-def get_profile(profile_id: int, db: Session = Depends(get_db)):
-    profile = db.query(ConsultantProfile).filter(ConsultantProfile.id == profile_id).first()
-    if not profile:
-        raise HTTPException(status_code=404, detail="Profile not found")
-    return profile
-
 #-------------OTP Generation and Email Sending-------------
 @router.post("/send-otp")
 async def send_otp(data: EmailRequest):
@@ -233,7 +246,7 @@ def login(data: schemas.LoginRequest, db: Session = Depends(get_db)):
         )
 
     token_data = {"sub": data.email, "role": role}
-    access_token = auth.create_access_token(token_data)
+    access_token = create_access_token(token_data)
 
     return {
         "access_token": access_token,
@@ -241,6 +254,43 @@ def login(data: schemas.LoginRequest, db: Session = Depends(get_db)):
         "role": role,
         "user_id": user.id 
     }
+
+#-------------User Profile Endpoints-------------
+@router.get("/profile")
+def get_user_profile(
+    token: str = Depends(oauth2_scheme),
+    x_user_id: int = Header(..., alias="X-User-Id"),
+    x_user_role: str = Header(..., alias="X-User-Role"),
+    db: Session = Depends(get_db)
+):
+    # Validate the token
+    try:
+        payload = verify_access_token(token)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+
+    # Fetch user from the appropriate table
+    if x_user_role == "user":
+        user = db.query(ConsultantProfile).filter(ConsultantProfile.id == x_user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        return {"name": user.name, "email": user.primary_email}
+
+    elif x_user_role == "recruiter":
+        user = db.query(recruiter).filter(recruiter.id == x_user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="Recruiter not found")
+        return {"name": user.name, "email": user.email, "company": user.company_name}
+
+    elif x_user_role == "admin":
+        user = db.query(admin).filter(admin.id == x_user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="Admin not found")
+        return {"name": user.name, "email": user.email}
+
+    else:
+        raise HTTPException(status_code=400, detail="Invalid role")
+
 
 
 # ---------- Resume  ----------
@@ -286,6 +336,7 @@ def post_job(job: JobCreate, db: Session = Depends(get_db)):
     db.refresh(new_job)
     return new_job
 
+#---------- Get all jobs ----------
 @router.get("/jobs/", response_model=List[JobResponse])
 def get_jobs(db: Session = Depends(get_db)):
     return db.query(Job).all()

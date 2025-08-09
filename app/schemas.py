@@ -25,6 +25,13 @@ class JDInput(BaseModel):
     title: str
     content: str
 
+
+#------------add admin -----------------
+class AdminCreate(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
+
 # ---------- Nested Schemas for Related Tables ----------
 
 class EducationDetailInput(BaseModel):
@@ -198,16 +205,29 @@ class LoginResponse(BaseModel):
     role: str
     user_id: int
 
+#-------------User Profile Endpoints-------------
+class UserProfile(BaseModel):
+    id: int
+    name: str
+    email: EmailStr
+    role: str
+
+    class Config:
+        from_attributes = True
+
+
 #--------------Job Description Schemas-------------
 class JobCreate(BaseModel):
     recruiter_id: int
     job_title: str
-    job_description: Optional[str] = None
-    location: Optional[str] = None
-    employment_type: Optional[str] = None
-    required_skills: List[str] = []
-    salary_range: Optional[str] = None
-    deadline_to_apply: Optional[datetime] = None  
+    experience_level: str
+    job_description: Optional[str]
+    location: Optional[str]
+    employment_type: Optional[str]
+    required_skills: List[str]
+    preferred_skills: Optional[List[str]]
+    salary_range: Optional[str]
+    deadline_to_apply: Optional[datetime]  
 
 class JobResponse(JobCreate):
     id: int
