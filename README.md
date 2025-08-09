@@ -28,11 +28,9 @@ rankitech-backend/
 │   ├── __init__.py
 │   ├── main.py                # Entry point for FastAPI app
 │   ├── config.py              # Settings & environment variables
-│   ├── models/                # Pydantic models
+│   ├── models.py                # Pydantic models
 │   ├── api/                   # API routes
-│   ├── services/              # Business logic (matching, ranking)
-│   ├── core/                  # Core logic (email, utils)
-│   └── tasks/                 # Background tasks (Celery)
+│   └── tasks.py                 # Background tasks (Celery)
 │
 ├── tests/                     # Unit and integration tests
 │
@@ -41,7 +39,6 @@ rankitech-backend/
 ├── requirements.txt           # Python dependencies
 ├── .env.example               # Example env variables
 ├── README.md                  # Project documentation
-└── venv/                      # Python virtual environment (ignored in .gitignore)
 ```
 
 ---
@@ -88,25 +85,14 @@ This will start:
 
 ## Tech Stack
 
-* **Language:** Python 3.10+
+* **Language:** Python 3.13
 * **Framework:** FastAPI
 * **Task Queue:** Celery
-* **Message Broker:** Redis (can be switched to RabbitMQ)
+* **Message Broker:** Redis 
 * **Containerization:** Docker & Docker Compose
 * **Testing:** Pytest
 * **Version Control:** Git, GitHub
 
----
-
-## API Endpoints (Coming Soon)
-
-### Example
-
-| Method | Endpoint          | Description                       |
-| ------ | ----------------- | --------------------------------- |
-| POST   | `/match`          | Submit JD and consultant profiles |
-| GET    | `/health`         | Health check                      |
-| GET    | `/ranked-results` | Get last ranked result (sample)   |
 
 ---
 
@@ -132,7 +118,7 @@ You can deploy this backend using:
 
 * Docker (recommended)
 * AWS/GCP/Azure (container instances)
-* Any VM or bare-metal server (via `gunicorn` + `uvicorn`)
+* Any VM or bare-metal server (via  `uvicorn`)
 
 ---
 
