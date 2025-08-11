@@ -292,14 +292,14 @@ class UserProfile(BaseModel):
 class JobCreate(BaseModel):
     recruiter_id: int
     job_title: str
-    experience_level: str
-    job_description: Optional[str]
-    location: Optional[str]
-    employment_type: Optional[str]
-    required_skills: List[str]
-    preferred_skills: Optional[List[str]]
-    salary_range: Optional[str]
-    deadline_to_apply: Optional[datetime]  
+    experience_level: Optional[str] = None
+    job_description: Optional[str] = None
+    location: Optional[str] = None
+    employment_type: Optional[str] = None
+    required_skills: List[str] = None
+    preferred_skills: Optional[List[str]] = None
+    salary_range: Optional[str] = None
+    deadline_to_apply: Optional[datetime]  = None
 
 class JobResponse(JobCreate):
     id: int

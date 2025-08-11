@@ -111,3 +111,26 @@ Traceback (most recent call last):
     version = _bcrypt.__about__.__version__
               ^^^^^^^^^^^^^^^^^
 AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-08-11 08:30:33,268 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.13/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-08-11 08:49:59,100 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.13/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-08-11 09:04:19,055 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-11 09:04:19,069 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-11 09:04:19,124 - app.resume_matcher - INFO - Processing resume: /tmp/tmp81m7m0o6.pdf
+2025-08-11 09:04:34,311 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-11 09:04:34,316 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-11 09:04:40,987 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-11 09:04:41,005 - app.resume_matcher - INFO - Results saved: match_result_20250811_090440.json
+2025-08-11 09:04:41,006 - app.resume_matcher - INFO - Processing resume: /tmp/tmp81m7m0o6.pdf
+2025-08-11 09:04:44,778 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-11 09:04:44,779 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-11 09:04:44,780 - app.resume_matcher - INFO - Generated report for: Poagesh N
