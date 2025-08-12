@@ -772,22 +772,23 @@ def rank_job_applicants(request: RankApplicantsRequest, db: Session = Depends(ge
                 job_id=job.id,
                 consultant_id=consultant.id,
                 match_score=float(result.overall_score),
-                top_skills_matched=",".join(result.matching_skills),  # Convert list to comma-separated string
-                missing_skills=",".join(result.missing_skills),
+                top_skills_matched=result.matching_skills,  
+                missing_skills=result.missing_skills,       
                 report=report,
                 created_at=datetime.utcnow()
             )
             db.add(db_match)
 
-            # Append to results
+            # Append to results (keep as lists)
             results.append(ApplicantRankedMatch(
                 consultant_id=consultant.id,
                 consultant_name=consultant.name,
                 match_score=result.overall_score,
                 top_skills_matched=result.matching_skills,
-                missing_skills=result.missing_skills,
+                missing_skills=result.missing_skills,      
                 report=report
             ))
+
 
         except Exception as e:
             print(f"Error processing consultant {consultant.id}: {e}")
@@ -982,3 +983,33 @@ def update_ranked_applicant_match_endpoint(id: int, match: RankedApplicantMatchU
 def delete_ranked_applicant_match_endpoint(id: int, db: Session = Depends(get_db)):
     delete_ranked_applicant_match(id, db)
     return {"detail": "RankedApplicantMatch deleted"}
+
+#----------------- Job Processing Endpoints -----------------
+@router.post("/jobs/{job_id}/process-deadline")
+def process_job_deadline_manually(job_id: int, db: Session = Depends(get_db)):
+    """Manually trigger deadline processing for testing"""
+    job = db.query(Job).filter(Job.id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    
+    if job.email_sent:
+        raise HTTPException(status_code=400, detail="Job already processed")
+    
+    # Trigger processing
+    task = process_expired_job.delay(job_id)
+    
+    return {
+        "message": f"Processing job {job_id} started",
+        "task_id": task.id,
+        "job_title": job.job_title
+    }
+
+@router.get("/jobs/pending-deadline")
+def get_jobs_pending_deadline(db: Session = Depends(get_db)):
+    """Get jobs that have passed deadline but not yet processed"""
+    now = datetime.utcnow()
+    pending_jobs = db.query(Job).filter(
+        Job.deadline_to_apply <= now,
+        Job.email_sent == False
+    ).all()
+    return pending_jobs

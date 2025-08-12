@@ -196,7 +196,6 @@ class Resume(Base):
     uploaded_at = Column(TIMESTAMP, server_default=func.now())
 
 #------------Post new job description----------
-
 class Job(Base):
     __tablename__ = 'jobs'
 
@@ -213,8 +212,14 @@ class Job(Base):
     deadline_to_apply = Column(DateTime, nullable=True)  
     created_at = Column(TIMESTAMP, server_default=func.now())
     email_sent = Column(Boolean, default=False)
+    
+    # NEW COLUMNS (now with proper defaults)
+    max_candidates = Column(Integer, nullable=False, default=5)
+    status = Column(String, nullable=False, default="active")
 
     applications = relationship("JobApplication", back_populates="job", cascade="all, delete-orphan")
+
+
 
 #------------ Job applications ----------
 class JobApplication(Base):
@@ -244,3 +249,4 @@ class RankedApplicantMatch(Base):
 
     consultant = relationship("ConsultantProfile")
     job = relationship("Job")
+    

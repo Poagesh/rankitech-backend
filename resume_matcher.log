@@ -134,3 +134,201 @@ AttributeError: module 'bcrypt' has no attribute '__about__'
 2025-08-11 09:04:44,778 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
 2025-08-11 09:04:44,779 - app.resume_matcher - INFO - Resume processed: Poagesh N
 2025-08-11 09:04:44,780 - app.resume_matcher - INFO - Generated report for: Poagesh N
+2025-08-11 13:27:10,665 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.13/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-08-11 13:27:28,330 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-11 13:27:28,344 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-11 13:27:28,414 - app.resume_matcher - INFO - Processing resume: /tmp/tmpxojns81h.pdf
+2025-08-11 13:27:52,324 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-11 13:27:52,327 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-11 13:28:00,480 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-11 13:28:00,493 - app.resume_matcher - INFO - Results saved: match_result_20250811_132800.json
+2025-08-11 13:28:00,494 - app.resume_matcher - INFO - Processing resume: /tmp/tmpxojns81h.pdf
+2025-08-11 13:28:06,229 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-11 13:28:06,236 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-11 13:28:06,238 - app.resume_matcher - INFO - Generated report for: Poagesh N
+2025-08-11 13:37:15,165 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-11 13:37:15,169 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-11 13:37:15,180 - app.resume_matcher - INFO - Processing resume: /tmp/tmpla5e9969.pdf
+2025-08-11 13:37:29,722 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-11 13:37:29,725 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-11 13:37:38,012 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-11 13:37:38,021 - app.resume_matcher - INFO - Results saved: match_result_20250811_133738.json
+2025-08-11 13:37:38,021 - app.resume_matcher - INFO - Processing resume: /tmp/tmpla5e9969.pdf
+2025-08-11 13:37:43,360 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-11 13:37:43,363 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-11 13:37:43,363 - app.resume_matcher - INFO - Generated report for: Poagesh N
+2025-08-11 13:58:02,188 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-11 13:58:02,195 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-11 13:58:02,209 - app.resume_matcher - INFO - Processing resume: /tmp/tmpt8vxn5m8.pdf
+2025-08-11 13:58:15,179 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-11 13:58:15,189 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-11 13:58:23,511 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-11 13:58:23,525 - app.resume_matcher - INFO - Results saved: match_result_20250811_135823.json
+2025-08-11 13:58:23,526 - app.resume_matcher - INFO - Processing resume: /tmp/tmpt8vxn5m8.pdf
+2025-08-11 13:58:29,392 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-11 13:58:29,394 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-11 13:58:29,396 - app.resume_matcher - INFO - Generated report for: Poagesh N
+2025-08-12 03:09:55,934 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.13/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-08-12 03:24:23,792 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.13/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-08-12 04:05:50,788 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.13/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-08-12 04:15:24,837 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-12 04:15:24,848 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-12 04:15:24,873 - app.resume_matcher - INFO - Processing resume: /tmp/tmp_w97wviu.pdf
+2025-08-12 04:15:40,998 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 04:15:41,005 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-12 04:15:47,091 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 04:15:47,102 - app.resume_matcher - INFO - Results saved: match_result_20250812_041547.json
+2025-08-12 04:15:47,102 - app.resume_matcher - INFO - Processing resume: /tmp/tmp_w97wviu.pdf
+2025-08-12 04:15:50,986 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 04:15:50,988 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-12 04:15:50,989 - app.resume_matcher - INFO - Generated report for: Poagesh N
+2025-08-12 04:24:31,927 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.13/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-08-12 04:24:37,270 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-12 04:24:37,273 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-12 04:24:37,289 - app.resume_matcher - INFO - Processing resume: /tmp/tmp6ltjw1w1.pdf
+2025-08-12 04:24:45,419 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 04:24:45,435 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-12 04:24:50,859 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 04:24:50,867 - app.resume_matcher - INFO - Results saved: match_result_20250812_042450.json
+2025-08-12 04:24:50,868 - app.resume_matcher - INFO - Processing resume: /tmp/tmp6ltjw1w1.pdf
+2025-08-12 04:24:54,404 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 04:24:54,405 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-12 04:24:54,405 - app.resume_matcher - INFO - Generated report for: Poagesh N
+2025-08-12 04:35:41,226 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-12 04:35:41,237 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-12 04:35:41,262 - app.resume_matcher - INFO - Processing resume: /tmp/tmpmrvjrzoi.pdf
+2025-08-12 04:35:51,343 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 04:35:51,345 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-12 04:35:57,026 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 04:35:57,041 - app.resume_matcher - INFO - Results saved: match_result_20250812_043557.json
+2025-08-12 04:35:57,041 - app.resume_matcher - INFO - Processing resume: /tmp/tmpmrvjrzoi.pdf
+2025-08-12 04:36:00,915 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 04:36:00,922 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-12 04:36:00,923 - app.resume_matcher - INFO - Generated report for: Poagesh N
+2025-08-12 04:38:39,056 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-12 04:38:39,059 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-12 04:38:39,077 - app.resume_matcher - INFO - Processing resume: /tmp/tmpv3qmuq1t.pdf
+2025-08-12 04:38:43,156 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 04:38:43,158 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-12 04:38:48,578 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 04:38:48,587 - app.resume_matcher - INFO - Results saved: match_result_20250812_043848.json
+2025-08-12 04:38:48,587 - app.resume_matcher - INFO - Processing resume: /tmp/tmpv3qmuq1t.pdf
+2025-08-12 04:38:52,154 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 04:38:52,156 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-12 04:38:52,156 - app.resume_matcher - INFO - Generated report for: Poagesh N
+2025-08-12 04:39:19,440 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-12 04:39:19,449 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-12 04:39:19,458 - app.resume_matcher - INFO - Processing resume: /tmp/tmpljdo3h2y.pdf
+2025-08-12 04:39:23,389 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 04:39:23,390 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-12 04:39:28,617 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 04:39:28,644 - app.resume_matcher - INFO - Results saved: match_result_20250812_043928.json
+2025-08-12 04:39:28,645 - app.resume_matcher - INFO - Processing resume: /tmp/tmpljdo3h2y.pdf
+2025-08-12 04:39:32,354 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 04:39:32,358 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-12 04:39:32,360 - app.resume_matcher - INFO - Generated report for: Poagesh N
+2025-08-12 04:39:42,857 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-12 04:39:42,867 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-12 04:39:42,886 - app.resume_matcher - INFO - Processing resume: /tmp/tmpbmf9liy_.pdf
+2025-08-12 04:39:46,930 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 04:39:46,931 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-12 04:39:52,370 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 04:39:52,378 - app.resume_matcher - INFO - Results saved: match_result_20250812_043952.json
+2025-08-12 04:39:52,379 - app.resume_matcher - INFO - Processing resume: /tmp/tmpbmf9liy_.pdf
+2025-08-12 04:39:55,898 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 04:39:55,899 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-12 04:39:55,899 - app.resume_matcher - INFO - Generated report for: Poagesh N
+2025-08-12 08:37:13,862 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.13/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-08-12 08:37:21,184 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-12 08:37:21,188 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-12 08:37:21,202 - app.resume_matcher - INFO - Processing resume: /tmp/tmpfxrsnfir.pdf
+2025-08-12 08:37:33,317 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 08:37:33,319 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-12 08:37:38,966 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 08:37:38,975 - app.resume_matcher - INFO - Results saved: match_result_20250812_083738.json
+2025-08-12 08:37:38,976 - app.resume_matcher - INFO - Processing resume: /tmp/tmpfxrsnfir.pdf
+2025-08-12 08:37:42,972 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 08:37:42,974 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-12 08:37:42,975 - app.resume_matcher - INFO - Generated report for: Poagesh N
+2025-08-12 08:58:32,098 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-12 08:58:32,098 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-12 08:58:32,098 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-12 08:58:32,099 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-12 08:58:32,099 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-12 08:58:32,099 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-12 09:08:34,391 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-12 09:08:34,391 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-12 09:08:34,393 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-12 09:08:34,393 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-12 09:08:34,410 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-12 09:08:34,410 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-12 14:22:12,751 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-12 14:22:12,752 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-12 14:22:12,752 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-12 14:22:12,753 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-12 14:22:12,779 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-12 14:22:12,780 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-12 14:29:58,939 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.13/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-08-12 14:32:24,530 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-12 14:32:24,541 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-12 14:32:24,590 - app.resume_matcher - INFO - Processing resume: /tmp/tmpqh5pm8ve.pdf
+2025-08-12 14:32:42,856 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 14:32:42,872 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-12 14:32:48,719 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 14:32:48,743 - app.resume_matcher - INFO - Results saved: match_result_20250812_143248.json
+2025-08-12 14:32:48,744 - app.resume_matcher - INFO - Processing resume: /tmp/tmpqh5pm8ve.pdf
+2025-08-12 14:32:52,609 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 14:32:52,611 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-12 14:32:52,613 - app.resume_matcher - INFO - Generated report for: Poagesh N
+2025-08-12 14:51:26,019 - httpx - INFO - HTTP Request: GET http://host.docker.internal:11434/api/tags "HTTP/1.1 200 OK"
+2025-08-12 14:51:26,035 - app.resume_matcher - INFO - Resume-JD Matcher initialized successfully
+2025-08-12 14:51:26,059 - app.resume_matcher - INFO - Processing resume: /tmp/tmp4w5pitof.pdf
+2025-08-12 14:51:40,642 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 14:51:40,645 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-12 14:51:47,623 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 14:51:47,638 - app.resume_matcher - INFO - Results saved: match_result_20250812_145147.json
+2025-08-12 14:51:47,639 - app.resume_matcher - INFO - Processing resume: /tmp/tmp4w5pitof.pdf
+2025-08-12 14:51:51,254 - httpx - INFO - HTTP Request: POST http://host.docker.internal:11434/api/generate "HTTP/1.1 200 OK"
+2025-08-12 14:51:51,255 - app.resume_matcher - INFO - Resume processed: Poagesh N
+2025-08-12 14:51:51,256 - app.resume_matcher - INFO - Generated report for: Poagesh N
+2025-08-12 16:19:53,375 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-12 16:19:53,375 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-12 16:19:53,376 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-12 16:19:53,376 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2
+2025-08-12 16:19:53,383 - sentence_transformers.SentenceTransformer - INFO - Use pytorch device_name: cpu
+2025-08-12 16:19:53,383 - sentence_transformers.SentenceTransformer - INFO - Load pretrained SentenceTransformer: all-MiniLM-L6-v2

@@ -253,7 +253,7 @@ class ConsultantProfileResponse(BaseModel):
     address_line: Optional[str]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 #--------------OTP Verification Schemas-------------
@@ -300,11 +300,14 @@ class JobCreate(BaseModel):
     preferred_skills: Optional[List[str]] = None
     salary_range: Optional[str] = None
     deadline_to_apply: Optional[datetime]  = None
+    max_candidates: int = 5
 
 class JobResponse(JobCreate):
     id: int
-    created_at: datetime  
-
+    created_at: datetime
+    email_sent: bool = False
+    status: str = "active"     
+    
     class Config:
         from_attributes = True
 
@@ -318,6 +321,7 @@ class JobUpdate(BaseModel):
     preferred_skills: Optional[List[str]]
     salary_range: Optional[str]
     deadline_to_apply: Optional[datetime]
+    max_candidates: Optional[int] = 5
 
 #--------------Job Application Schemas-------------
 class JobApplicationCreate(BaseModel):
@@ -346,17 +350,17 @@ class ApplicantRankedMatch(BaseModel):
     consultant_id: int
     consultant_name: str
     match_score: float
-    top_skills_matched: List[str]
-    missing_skills: List[str]
-    report: str
+    top_skills_matched: List[str] | None = None
+    missing_skills: List[str] | None = None
+    report: str | None = None
 
 class RankedApplicantMatchInput(BaseModel):
     job_id: int
     consultant_id: int
     match_score: float
-    top_skills_matched: List[str]
-    missing_skills: List[str]
-    report: str
+    top_skills_matched: List[str] | None = None
+    missing_skills: List[str] | None = None
+    report: str | None = None
 
 #--------------- CRUD for Match Results -------------
 class MatchResultCreate(BaseModel):
@@ -383,16 +387,16 @@ class RankedApplicantMatchCreate(BaseModel):
     job_id: int
     consultant_id: int
     match_score: float
-    top_skills_matched: Dict[str, Any] | None = None
-    missing_skills: Dict[str, Any] | None = None
+    top_skills_matched: List[str] | None = None
+    missing_skills: List[str] | None = None
     report: str | None = None
 
 class RankedApplicantMatchUpdate(BaseModel):
     job_id: int | None = None
     consultant_id: int | None = None
     match_score: float | None = None
-    top_skills_matched: Dict[str, Any] | None = None
-    missing_skills: Dict[str, Any] | None = None
+    top_skills_matched: List[str] | None = None  # ← Changed from str to List[str]
+    missing_skills: List[str] | None = None
     report: str | None = None
 
 class RankedApplicantMatchResponse(BaseModel):
@@ -400,9 +404,9 @@ class RankedApplicantMatchResponse(BaseModel):
     job_id: int
     consultant_id: int
     match_score: float
-    top_skills_matched: Dict[str, Any] | None
-    missing_skills: Dict[str, Any] | None
-    report: str | None
+    top_skills_matched: List[str] | None = None  # ← Changed from str to List[str]
+    missing_skills: List[str] | None = None
+    report: str | None = None
     created_at: datetime
 
     class Config:
